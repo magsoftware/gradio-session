@@ -1,0 +1,2 @@
+class RedisSessionStore:
+    pass
