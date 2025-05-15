@@ -9,7 +9,7 @@ from middleware import AuthMiddleware, LoggingMiddleware, SessionMiddleware
 from routes import health_router, home_router, login_router
 from session import InMemorySessionStore, initialize_session_store
 import settings
-from ui.gradio_app import create_gradio_app
+from ui import create_gradio_app
 
 
 MAX_LOC_LENGTH = 40
