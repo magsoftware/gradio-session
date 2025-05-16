@@ -11,7 +11,6 @@ from session import InMemorySessionStore, initialize_session_store
 import settings
 from ui import create_gradio_app
 
-
 MAX_LOC_LENGTH = 40
 
 def format_location(record) -> bool:
