@@ -15,15 +15,13 @@ def create_gradio_app() -> gr.Blocks:
         session_id = gr.State()
 
         def load_session(request: gr.Request):
-            from services import verify_token
+            session_id = getattr(request.state, "session_id", None)
+            if not session_id:
+                logger.error("Session ID not found in request state.")
+            logger.info(f"Session ID {session_id}")
+            return session_id
 
-            token = request.cookies.get("access_token")
-            if not token:
-                return None
-            payload = verify_token(token)
-            return payload.get("session_id")
-
-        # This sets the state on load
+        # This sets the state on load ie. puts session_id to Gradio State
         gradio_app.load(fn=load_session, inputs=[], outputs=[session_id])
 
         create_navbar()

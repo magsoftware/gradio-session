@@ -37,9 +37,6 @@ class SessionMiddleware(BaseHTTPMiddleware):
                 },
             )
 
-        request.state.session_data = session_data
-        logger.info(
-            f"Session data retrieved for session {session_id}: {request.state.session_data}"
-        )
+        logger.debug(f"Session data retrieved for session {session_id}: {session_data}")
 
         return await call_next(request)
