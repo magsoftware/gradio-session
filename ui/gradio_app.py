@@ -18,6 +18,7 @@ def create_gradio_app() -> gr.Blocks:
             session_id = getattr(request.state, "session_id", None)
             if not session_id:
                 logger.error("Session ID not found in request state.")
+                return None
             logger.info(f"Session ID {session_id}")
             return session_id
 
