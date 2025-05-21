@@ -41,7 +41,7 @@ initialize_session_store(InMemorySessionStore())
 # Main FastAPI application
 app = FastAPI(title=settings.PROJECTNAME, version=settings.VERSION)
 
-# The sequence is important
+# Middleware are executed in reverse order of their addition
 app.add_middleware(LoggingMiddleware)
 app.add_middleware(SessionMiddleware)
 app.add_middleware(AuthMiddleware)
