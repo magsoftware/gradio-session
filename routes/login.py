@@ -53,12 +53,10 @@ async def login(
 
         response = RedirectResponse(url="/gradio", status_code=302)
         response.set_cookie(key="access_token", value=access_token, httponly=True)
-        response.set_cookie(key="session_id", value=session_id, httponly=False)
-        os.environ["USER_ID"] = user.username
-
         logger.info(
             f"Login: user={user.username} successfully logged in, session_id={session_id}"
         )
+
         return response
 
     return templates.TemplateResponse(
