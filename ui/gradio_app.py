@@ -12,22 +12,9 @@ def create_gradio_app() -> gr.Blocks:
     with gr.Blocks(
         title="Gradio App", visible=True, fill_width=True, js=redirect_js
     ) as gradio_app:
-        session_id = gr.State()
-
-        def load_session(request: gr.Request):
-            session_id = getattr(request.state, "session_id", None)
-            if not session_id:
-                logger.error("Session ID not found in request state.")
-                return None
-            logger.info(f"Session ID {session_id}")
-            return session_id
-
-        # This sets the state on load ie. puts session_id to Gradio State
-        gradio_app.load(fn=load_session, inputs=[], outputs=[session_id])
-
         create_navbar()
 
-        home_page = HomePage(session_id)
+        home_page = HomePage()
         home_page.render(visible=True)
 
     return gradio_app

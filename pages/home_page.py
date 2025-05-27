@@ -1,5 +1,7 @@
 import gradio as gr
+from loguru import logger
 
+from core import get_session_id
 from session import get_session_store
 
 from .base_page import BasePage
@@ -10,11 +12,13 @@ class Tab1(BaseTab):
     def __init__(self) -> None:
         super().__init__("Tab1")
 
-    def create_ui(self, tab_component: gr.Tab, session_id: gr.State) -> None:
+    def create_ui(self, tab_component: gr.Tab) -> None:
         show_btn = gr.Button("Show my session")
-        show_btn.click(fn=self.show_session, inputs=[session_id], outputs=gr.Textbox())
+        show_btn.click(fn=self.show_session, inputs=[], outputs=gr.Textbox())
 
-    def show_session(self, session_id: gr.State) -> str:
+    def show_session(self, request: gr.Request) -> str:
+        session_id = get_session_id(request)
+        logger.info(f"Showing session for session_id: {session_id}")
         return f"{get_session_store().dump_session(session_id)}"
 
 
@@ -22,39 +26,27 @@ class Tab2(BaseTab):
     def __init__(self) -> None:
         super().__init__("Tab2")
 
-    def create_ui(self, tab_component: gr.Tab, session_id: gr.State) -> None:
+    def create_ui(self, tab_component: gr.Tab) -> None:
         show_btn = gr.Button("Dump session store")
         show_btn.click(fn=self.dump_sessions, outputs=gr.Textbox())
 
     def dump_sessions(self) -> str:
-        store = get_session_store()
-        return store.dump_store()
-
-
-class Tab3(BaseTab):
-    def __init__(self) -> None:
-        super().__init__("Tab3")
-
-    def create_ui(self, tab_component: gr.Tab, session_id: gr.State) -> None:
-        show_btn = gr.Button("Show session")
-        show_btn.click(fn=self.show_session, inputs=[session_id], outputs=gr.Textbox())
-
-    def show_session(self, session_id: gr.State) -> str:
-        return f"{get_session_store().dump_session(session_id)}"
+        return get_session_store().dump_store()
 
 
 class HomePage(BasePage):
-    def __init__(self, session_id: gr.State) -> None:
+    def __init__(self) -> None:
         super().__init__(label="Home", title="Home Page")
-        self.session_id = session_id
         self.tabs = [
             Tab1(),
             Tab2(),
-            Tab3(),
         ]
+        logger.info(
+            f"HomePage initialized with tabs: {[tab.name for tab in self.tabs]}"
+        )
 
     def create_ui(self) -> None:
         with gr.Tabs():
             for tab in self.tabs:
                 with gr.Tab(tab.name) as tab_component:
-                    tab.create_ui(tab_component, self.session_id)
+                    tab.create_ui(tab_component)

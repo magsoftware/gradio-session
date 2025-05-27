@@ -8,5 +8,5 @@ class BaseTab(ABC):
         self.name = name
 
     @abstractmethod
-    def create_ui(self, tab_component: gr.Tab, session_id: gr.State) -> None:
+    def create_ui(self, tab_component: gr.Tab) -> None:
         pass

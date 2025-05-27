@@ -1,5 +1,5 @@
-import threading
 from datetime import datetime
+import threading
 import time
 from typing import Optional
 

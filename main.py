@@ -1,6 +1,8 @@
 import sys
 
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 import gradio as gr
 from loguru import logger
 import uvicorn
@@ -50,6 +52,16 @@ app.add_middleware(AuthMiddleware)
 app.include_router(login_router)
 app.include_router(health_router)
 app.include_router(home_router)
+
+# Add static files for serving Gradio assets
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+# Serve the manifest file
+@app.get("/manifest.json")
+async def manifest():
+    return FileResponse("static/manifest.json")
+
 
 # Mount gradio app
 gr.mount_gradio_app(app, create_gradio_app(), path="/gradio")
