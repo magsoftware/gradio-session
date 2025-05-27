@@ -1,5 +1,3 @@
-from contextvars import ContextVar
-
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from loguru import logger
