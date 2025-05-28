@@ -2,7 +2,36 @@
 
 
 
-## Architecture
+## Session Store Structure
+
+Session Store structure:
+
+┌──────────────────────────────┐
+│    InMemorySessionStore      │
+│     (self._store: dict)      │
+└──────────────────────────────┘
+              │
+              ▼
+┌────────────────────────────────────────────────────────┐
+│   session_id (str)     |         session data          │
+├────────────────────────┬───────────────────────────────┤
+│      "abc123"          │    {"data": {...},            │
+│                        │     "expire_at": <timestamp>} │
+├────────────────────────┼───────────────────────────────┤
+│      "xyz789"          │    {"data": {...},            │
+│                        │     "expire_at": <timestamp>} │
+└────────────────────────┴───────────────────────────────┘
+
+Each "data" dict inside looks like:
+
+       data = {
+           "user_id": "user-42",
+           "custom1": { ... }  ← any session-specific data
+           "custom2": { ... }  ← any session-specific data
+       }
+
+
+## Architecture with Redis
 
                        ┌────────────────────┐
                        │      User          │
