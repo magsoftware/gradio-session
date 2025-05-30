@@ -22,6 +22,15 @@ templates = Jinja2Templates(directory="templates")
 
 @router.get("/login", name="login", response_class=HTMLResponse)
 async def login_page(request: Request) -> HTMLResponse:
+    """
+    Renders the login page with a CSRF token.
+
+    Args:
+        request (Request): The incoming HTTP request object.
+
+    Returns:
+        HTMLResponse: The rendered login page with a CSRF token included in the context.
+    """
     csrf_token = generate_csrf_token(request)
     return templates.TemplateResponse(
         "login.html", {"request": request, "error": None, "csrf_token": csrf_token}
@@ -34,7 +43,24 @@ async def login(
     username: str = Form(...),
     password: str = Form(...),
     csrf_token: str = Form(...),
-) -> Any:
+) -> RedirectResponse | HTMLResponse:
+    """
+    Handles user login by validating CSRF token, authenticating credentials, and creating a session.
+
+    Args:
+        request (Request): The incoming HTTP request object.
+        username (str): The username submitted via form data.
+        password (str): The password submitted via form data.
+        csrf_token (str): The CSRF token submitted via form data.
+
+    Returns:
+        HTMLResponse: 
+            - If CSRF token is invalid, returns a rendered login template with an error message.
+            - If authentication fails, returns a rendered login template with an error message.
+        RedirectResponse:
+            - If authentication is successful, creates a session, sets an access token cookie,
+              and redirects to '/gradio'.
+    """
     if not validate_csrf_token(csrf_token, request):
         return templates.TemplateResponse(
             "login.html", {"request": request, "error": "Invalid CSRF token"}
@@ -62,6 +88,19 @@ async def login(
 
 @router.get("/logout", name="logout")
 async def logout(request: Request) -> RedirectResponse:
+    """
+    Logs out the current user by invalidating their session and removing the access token cookie.
+
+    This function retrieves the access token from the request cookies, verifies it, and if valid,
+    invalidates the associated session in the session store. It then redirects the user to the login
+    page and deletes the access token cookie from the response.
+
+    Args:
+        request (Request): The incoming HTTP request containing cookies.
+
+    Returns:
+        RedirectResponse: A redirect response to the login page with the access token cookie deleted.
+    """
     token = request.cookies.get("access_token")
     if token:
         payload = verify_token(token)

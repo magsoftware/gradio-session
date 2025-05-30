@@ -20,7 +20,16 @@ def init_user_db() -> None:
 
 
 def authenticate_user(username: str, password: str) -> Optional[User]:
-    """Authenticate a user by username and password."""
+    """
+    Authenticate a user by verifying the provided username and password.
+
+    Args:
+        username (str): The username of the user attempting to authenticate.
+        password (str): The password provided for authentication.
+
+    Returns:
+        Optional[User]: The authenticated User object if credentials are valid; otherwise, None.
+    """
     user = user_db.get(username)
     if user and user.password == password:
         return user

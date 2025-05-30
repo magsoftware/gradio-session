@@ -4,6 +4,8 @@ import gradio as gr
 
 
 class BaseTab(ABC):
+    """Abstract base class for all tabs."""
+
     def __init__(self, name: str) -> None:
         self.name = name
 

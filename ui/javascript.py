@@ -1,3 +1,24 @@
+"""
+JavaScript code as a string that defines a fetch interceptor for handling 401
+Unauthorized responses.
+
+This interceptor wraps the native `window.fetch` function to:
+- Log all outgoing requests and their URLs.
+- Log the status of all responses.
+- If a response has a 401 status code:
+    - Attempts to parse the response body as JSON.
+    - If the JSON contains a `redirect_to` field, logs the redirect URL and
+      redirects the browser to that URL after a short delay.
+    - Returns a dummy 200 OK response with a "Redirecting..." message to
+      prevent UI errors during the redirect.
+- If the response is not a 401, or if parsing fails, returns the original
+  response.
+
+Intended for use in a frontend application to handle authentication redirects
+automatically.o
+
+Used in main Gradio gr.Blocks statement.
+"""
 redirect_js = """
 () => {
     const originalFetch = window.fetch;
@@ -17,7 +38,7 @@ redirect_js = """
                     console.log("[Interceptor] Redirecting to:", data.redirect_to);
                     setTimeout(() => {
                         window.location.href = data.redirect_to;
-                    }, 1000);
+                    }, 1000); // 1000 ms delay before redirect
                     // Return empty response to avoid UI error
                     return new Response(JSON.stringify({ detail: "Redirecting..." }), {
                         status: 200,

@@ -10,6 +10,25 @@ from services import verify_token
 
 
 class AuthMiddleware(BaseHTTPMiddleware):
+    """
+    AuthMiddleware is a FastAPI middleware for handling authentication via access tokens.
+
+    This middleware intercepts incoming HTTP requests and performs the following actions:
+    - Logs the incoming request method and path.
+    - Checks if the request path is allowed to bypass authentication using `is_path_allowed`.
+    - Attempts to retrieve the "access_token" from the request cookies.
+    - Verifies the access token using `verify_token`.
+    - On successful verification, attaches the user ID and session ID from the token payload
+      to `request.state`.
+    - Logs the successful authentication and forwards the request to the next handler.
+
+    Attributes:
+        None
+
+    Methods:
+        dispatch(request, call_next)
+            Handles the authentication logic for each incoming request.
+    """
     async def dispatch(
         self,
         request: Request,

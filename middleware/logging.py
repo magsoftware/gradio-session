@@ -6,6 +6,23 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):
+    """
+    Middleware for logging HTTP requests and responses in a FastAPI application.
+
+    Logs the HTTP method, request path, user ID, session ID, response status code,
+    and request duration in milliseconds.
+
+    If an exception occurs during request processing, logs the exception details
+    along with the same contextual information.
+
+    Attributes:
+        None
+
+    Methods:
+        dispatch(request: Request, call_next) -> Response
+            Handles the incoming request, logs relevant information before and
+            after processing, and ensures exceptions are logged with context.
+    """
     async def dispatch(self, request: Request, call_next) -> Response:
         start_time = time.perf_counter()
         method = request.method
