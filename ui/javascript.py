@@ -19,6 +19,7 @@ automatically.o
 
 Used in main Gradio gr.Blocks statement.
 """
+
 redirect_js = """
 () => {
     const originalFetch = window.fetch;

@@ -26,6 +26,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
         Response: The HTTP response, either from the next handler or an error response
             if session validation fails.
     """
+
     async def dispatch(self, request: Request, call_next) -> Response:
         logger.info(f"Processing request: {request.method} {request.url.path}")
 

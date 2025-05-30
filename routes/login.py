@@ -54,7 +54,7 @@ async def login(
         csrf_token (str): The CSRF token submitted via form data.
 
     Returns:
-        HTMLResponse: 
+        HTMLResponse:
             - If CSRF token is invalid, returns a rendered login template with an error message.
             - If authentication fails, returns a rendered login template with an error message.
         RedirectResponse:
@@ -86,7 +86,9 @@ async def login(
     )
 
 
-@router.get("/logout", name="logout", response_class=RedirectResponse, response_model=None)
+@router.get(
+    "/logout", name="logout", response_class=RedirectResponse, response_model=None
+)
 async def logout(request: Request) -> RedirectResponse:
     """
     Logs out the current user by invalidating their session and removing the access token cookie.

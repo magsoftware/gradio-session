@@ -29,6 +29,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         dispatch(request, call_next)
             Handles the authentication logic for each incoming request.
     """
+
     async def dispatch(
         self,
         request: Request,
@@ -64,4 +65,5 @@ class AuthMiddleware(BaseHTTPMiddleware):
         logger.info(
             f"Access token verified for user {request.state.user_id}, session_id {request.state.session_id}, proceeding with the request."
         )
+
         return await call_next(request)

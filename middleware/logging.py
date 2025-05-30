@@ -23,6 +23,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             Handles the incoming request, logs relevant information before and
             after processing, and ensures exceptions are logged with context.
     """
+
     async def dispatch(self, request: Request, call_next) -> Response:
         start_time = time.perf_counter()
         method = request.method

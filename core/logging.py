@@ -1,7 +1,7 @@
 import sys
+from typing import Any, Dict
 
 from loguru import logger
-from typing import Dict, Any
 
 MAX_LOC_LENGTH = 40
 
