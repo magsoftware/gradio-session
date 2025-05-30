@@ -44,14 +44,14 @@ easy replacement with Redis or other backends.
 ```
 
 
-## UI Interface (`ui` folder) and HomePage (`pages` folder)
+## UI Interface (`ui` folder) and HomePage (`ui/pages` folder)
 
 - The **`ui`** folder contains the logic for building the Gradio-based user interface. It includes:
   - Components for navigation and layout.
   - JavaScript interceptors for handling authentication redirects and enhancing UX.
   - The main entry point for the UI is a function (e.g., `create_gradio_app`) that assembles the Gradio Blocks interface.
 
-- The **`pages`** folder contains page definitions, including:
+- The **`ui/pages`** folder contains page definitions, including:
   - **HomePage**: The main protected page, typically with several tabs for different functionalities.
   - Each page is implemented as a class or function, making it easy to add new pages or tabs.
 

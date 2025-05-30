@@ -1,9 +1,9 @@
 import gradio as gr
 from loguru import logger
 
-from pages import HomePage
 from ui.javascript import redirect_js
 from ui.navbar import create_navbar
+from ui.pages import HomePage
 
 
 def create_gradio_app() -> gr.Blocks:
