@@ -15,17 +15,18 @@ Session Store structure:
 ┌────────────────────────────────────────────────────────┐
 │   session_id (str)     |         session data          │
 ├────────────────────────┬───────────────────────────────┤
-│      "abc123"          │    {"data": {...},            │
+│      "abc123"          │    {"data": {...},            |
+|                        |     "username": user1         │
 │                        │     "expire_at": <timestamp>} │
 ├────────────────────────┼───────────────────────────────┤
 │      "xyz789"          │    {"data": {...},            │
+|                        |     "username": user2         │
 │                        │     "expire_at": <timestamp>} │
 └────────────────────────┴───────────────────────────────┘
 
 Each "data" dict inside looks like:
 
        data = {
-           "user_id": "user-42",
            "custom1": { ... }  ← any session-specific data
            "custom2": { ... }  ← any session-specific data
        }

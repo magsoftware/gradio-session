@@ -25,9 +25,8 @@ class SessionMiddleware(BaseHTTPMiddleware):
                 content={"error": "Missing session ID", "redirect_to": "/login"},
             )
 
-        session_store = get_session_store()
-        session_data = session_store.get_session(session_id)
-        if not session_data:
+        session = get_session_store().get_session(session_id)
+        if not session:
             logger.info(f"Session data not found for session ID: {session_id}")
             return JSONResponse(
                 status_code=401,
@@ -37,6 +36,6 @@ class SessionMiddleware(BaseHTTPMiddleware):
                 },
             )
 
-        logger.debug(f"Session data retrieved for session {session_id}: {session_data}")
+        logger.debug(f"Session found retrieved for session {session_id}: {session}")
 
         return await call_next(request)

@@ -1,5 +1,3 @@
-import sys
-
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -12,30 +10,7 @@ from routes import health_router, home_router, login_router
 from session import InMemorySessionStore, initialize_session_store
 import settings
 from ui import create_gradio_app
-
-MAX_LOC_LENGTH = 40
-
-
-def format_location(record) -> bool:
-    location = f"{record['name']}:{record['function']}:{record['line']}"
-    if len(location) > MAX_LOC_LENGTH:
-        location = location[-MAX_LOC_LENGTH:]
-    else:
-        location = location.ljust(MAX_LOC_LENGTH)
-    record["location"] = location
-    return True
-
-
-# Loguru logging setup
-logger.remove()  # Remove default handler
-logger.add(
-    sys.stderr,
-    level="DEBUG",
-    format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
-    "<level>{level:<8}</level> | "
-    "<cyan>{location}</cyan> - <level>{message}</level>",
-    filter=format_location,
-)
+from core.logging import logger
 
 # Setup session store
 initialize_session_store(InMemorySessionStore())

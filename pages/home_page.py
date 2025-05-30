@@ -1,7 +1,7 @@
 import gradio as gr
 from loguru import logger
 
-from core import get_session_id
+from core.session import get_session_id
 from session import get_session_store
 
 from .base_page import BasePage

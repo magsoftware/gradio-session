@@ -46,8 +46,9 @@ async def login(
             username, expires_delta=timedelta(minutes=30)
         )
         get_session_store().create_session(
-            session_id,
-            {"user_id": user.username},
+            session_id=session_id,
+            username=user.username,
+            data={},
             ttl=60,  # TODO: set a proper TTL
         )
 
