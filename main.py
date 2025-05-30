@@ -6,7 +6,7 @@ from loguru import logger
 import uvicorn
 
 from middleware import AuthMiddleware, LoggingMiddleware, SessionMiddleware
-from routes import health_router, home_router, login_router
+from routes import health_router, home_router, login_router, static_router
 from session import InMemorySessionStore, initialize_session_store
 import settings
 from ui import create_gradio_app
@@ -27,16 +27,10 @@ app.add_middleware(AuthMiddleware)
 app.include_router(login_router)
 app.include_router(health_router)
 app.include_router(home_router)
+app.include_router(static_router)
 
 # Add static files for serving Gradio assets
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
-
-# Serve the manifest file
-@app.get("/manifest.json")
-async def manifest():
-    return FileResponse("static/manifest.json")
-
 
 # Mount gradio app
 gr.mount_gradio_app(app, create_gradio_app(), path="/gradio")

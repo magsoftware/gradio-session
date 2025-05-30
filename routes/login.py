@@ -1,5 +1,4 @@
 from datetime import timedelta
-import os
 from typing import Any
 
 from fastapi import APIRouter, Form, Request
