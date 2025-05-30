@@ -13,7 +13,7 @@ import settings
 from ui import create_gradio_app
 
 # Setup session store
-initialize_session_store(InMemorySessionStore(ttl=60, cleanup_interval=60))
+initialize_session_store(InMemorySessionStore(ttl=300, cleanup_interval=60))
 
 # Main FastAPI application
 app = FastAPI(title=settings.PROJECTNAME, version=settings.VERSION)
