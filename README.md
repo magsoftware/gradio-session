@@ -67,7 +67,8 @@ a memory of a running process.
 Each session is identified by a unique `session_id` and stores user-specific data, including expiration timestamps.
 
 The session store can be easily swapped for a persistent backend (e.g., Redis, any relational or NoSQL database) by
-implementing the same interface.
+implementing the same interface. In this way we can have application state maintained in an external system and
+thus make the application stateless and easily horizontally scalable.
 
 Session initialization and cleanup are handled automatically, and session data is accessible throughout the request
 lifecycle.
