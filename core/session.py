@@ -11,6 +11,7 @@ def get_session_id(request: gr.Request) -> str | None:
         return None
     return session_id
 
+
 def get_session(request: gr.Request) -> dict | None:
     session_id = get_session_id(request)
     if not session_id:

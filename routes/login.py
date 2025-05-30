@@ -45,12 +45,8 @@ async def login(
             username, expires_delta=timedelta(minutes=30)
         )
         get_session_store().create_session(
-            session_id=session_id,
-            username=user.username,
-            data={},
-            ttl=60,  # TODO: set a proper TTL
+            session_id=session_id, username=user.username, data={}
         )
-
         response = RedirectResponse(url="/gradio", status_code=302)
         response.set_cookie(key="access_token", value=access_token, httponly=True)
         logger.info(

@@ -5,15 +5,15 @@ import gradio as gr
 from loguru import logger
 import uvicorn
 
+from core.logging import logger
 from middleware import AuthMiddleware, LoggingMiddleware, SessionMiddleware
 from routes import health_router, home_router, login_router, static_router
 from session import InMemorySessionStore, initialize_session_store
 import settings
 from ui import create_gradio_app
-from core.logging import logger
 
 # Setup session store
-initialize_session_store(InMemorySessionStore())
+initialize_session_store(InMemorySessionStore(ttl=60, cleanup_interval=60))
 
 # Main FastAPI application
 app = FastAPI(title=settings.PROJECTNAME, version=settings.VERSION)

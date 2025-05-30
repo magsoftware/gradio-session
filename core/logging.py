@@ -1,5 +1,5 @@
-
 import sys
+
 from loguru import logger
 
 MAX_LOC_LENGTH = 40

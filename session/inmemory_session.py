@@ -8,9 +8,10 @@ from loguru import logger
 
 class InMemorySessionStore:
     def __init__(
-        self, cleanup_interval: int = 60
+        self, ttl: int = 60 * 30, cleanup_interval: int = 60
     ) -> None:  # Cleanup interval in seconds (default: 10 minutes)
         self._store = {}
+        self._ttl = ttl  # Default TTL for sessions in seconds
         self._cleanup_interval = cleanup_interval
         self._stop_cleanup_thread = threading.Event()
         self._cleanup_thread = threading.Thread(
@@ -18,14 +19,17 @@ class InMemorySessionStore:
         )
         self._cleanup_thread.start()
 
-    def create_session(
-        self, session_id: str, username: str, data: dict, ttl: int = 60
-    ) -> None:  # TODO: set a proper TTL
-        expire_at = time.time() + ttl
-        self._store[session_id] = {"username": username, "data": data, "expire_at": expire_at}
+    def create_session(self, session_id: str, username: str, data: dict) -> None:
+        expire_at = time.time() + self._ttl
+        self._store[session_id] = {
+            "username": username,
+            "data": data,
+            "expire_at": expire_at,
+        }
         logger.debug(self._format_session(session_id, self._store[session_id]))
+        return self._store[session_id]
 
-    def get_session(self, session_id: str, ttl: int = 60) -> Optional[dict]:
+    def get_session(self, session_id: str) -> Optional[dict]:
         session = self._store.get(session_id)
         if not session:
             return None
@@ -33,7 +37,7 @@ class InMemorySessionStore:
             self._store.pop(session_id, None)
             return None
         # Reset TTL
-        session["expire_at"] = time.time() + ttl
+        session["expire_at"] = time.time() + self._ttl
         logger.debug(self._format_session(session_id, session))
         return session
 
@@ -60,7 +64,7 @@ class InMemorySessionStore:
 
     def _format_session(self, session_id: str, session: dict) -> str:
         expire_at_iso = datetime.fromtimestamp(session["expire_at"]).isoformat()
-        return f"Session ID: {session_id}, Username: {session["username"]}, Expire At: {expire_at_iso}, Data: {session['data']}"
+        return f"Session ID: {session_id}, Username: {session['username']}, Expire At: {expire_at_iso}, Data: {session['data']}"
 
     def _cleanup_expired_sessions(self) -> None:
         while not self._stop_cleanup_thread.is_set():
