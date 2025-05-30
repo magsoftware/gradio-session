@@ -6,6 +6,7 @@
 
 Session Store structure:
 
+```text
 ┌──────────────────────────────┐
 │    InMemorySessionStore      │
 │     (self._store: dict)      │
@@ -30,10 +31,11 @@ Each "data" dict inside looks like:
            "custom1": { ... }  ← any session-specific data
            "custom2": { ... }  ← any session-specific data
        }
-
+```
 
 ## Architecture with Redis
 
+```text
                        ┌────────────────────┐
                        │      User          │
                        └────────┬───────────┘
@@ -62,10 +64,11 @@ Each "data" dict inside looks like:
                   ┌──────────────────────────────┐
                   │     Object Storage (S3, etc.)│  ◄──── Stores files, logs, data
                   └──────────────────────────────┘
-
+```
 
 ## Architecture with Celery Task Queue
 
+```text
                        ┌────────────────────┐
                        │       User         │
                        └────────┬───────────┘
@@ -103,3 +106,4 @@ Each "data" dict inside looks like:
                   ┌──────────────────────-────┐
                   │  Object Storage (e.g. S3) │
                   └─────────────────────-─────┘
+```
