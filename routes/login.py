@@ -20,7 +20,7 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-@router.get("/login", name="login", response_class=HTMLResponse)
+@router.get("/login", name="login", response_class=HTMLResponse, response_model=None)
 async def login_page(request: Request) -> HTMLResponse:
     """
     Renders the login page with a CSRF token.
@@ -37,7 +37,7 @@ async def login_page(request: Request) -> HTMLResponse:
     )
 
 
-@router.post("/login")
+@router.post("/login", response_model=None)
 async def login(
     request: Request,
     username: str = Form(...),
@@ -86,7 +86,7 @@ async def login(
     )
 
 
-@router.get("/logout", name="logout")
+@router.get("/logout", name="logout", response_class=RedirectResponse, response_model=None)
 async def logout(request: Request) -> RedirectResponse:
     """
     Logs out the current user by invalidating their session and removing the access token cookie.
