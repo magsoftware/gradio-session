@@ -40,3 +40,5 @@ logger.add(
     "<cyan>{location}</cyan> - <level>{message}</level>",
     filter=format_location,
 )
+
+logger.info("Logging initialized with custom format and location handler.")
