@@ -6,7 +6,23 @@ from typing import Dict, Any
 MAX_LOC_LENGTH = 40
 
 
-def format_location(record: Dict[str, Any]) -> bool:
+def setup_logging():
+    """
+    Sets up Loguru logging with a custom format and location handler.
+    """
+    logger.remove()  # Remove default handler
+    logger.add(
+        sys.stderr,
+        level="DEBUG",
+        format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
+        "<level>{level:<8}</level> | "
+        "<cyan>{location}</cyan> - <level>{message}</level>",
+        filter=_format_location,
+    )
+    logger.info("Logging initialized with custom format and location handler")
+
+
+def _format_location(record: Dict[str, Any]) -> bool:
     """
     Formats the 'location' field in a log record dictionary by combining the record's
     'name', 'function', and 'line' fields into a single string. The resulting string is
@@ -28,17 +44,3 @@ def format_location(record: Dict[str, Any]) -> bool:
         location = location.ljust(MAX_LOC_LENGTH)
     record["location"] = location
     return True
-
-
-# Loguru logging setup
-logger.remove()  # Remove default handler
-logger.add(
-    sys.stderr,
-    level="DEBUG",
-    format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
-    "<level>{level:<8}</level> | "
-    "<cyan>{location}</cyan> - <level>{message}</level>",
-    filter=format_location,
-)
-
-logger.info("Logging initialized with custom format and location handler.")

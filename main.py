@@ -4,12 +4,15 @@ import gradio as gr
 from loguru import logger
 import uvicorn
 
-from core.logging import logger
+from core.logging import setup_logging
 from middleware import AuthMiddleware, LoggingMiddleware, SessionMiddleware
 from routes import health_router, home_router, login_router, static_router
 from session import InMemorySessionStore, initialize_session_store
 import settings
 from ui import create_gradio_app
+
+# Setup logging
+setup_logging()
 
 # Setup session store
 initialize_session_store(InMemorySessionStore(ttl=300, cleanup_interval=60))
