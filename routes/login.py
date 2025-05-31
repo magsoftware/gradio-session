@@ -5,6 +5,7 @@ from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from loguru import logger
+from starlette.datastructures import URL
 
 from services import (
     authenticate_user,
@@ -21,7 +22,7 @@ templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/login", name="login", response_class=HTMLResponse, response_model=None)
-async def login_page(request: Request) -> HTMLResponse:
+async def login_page(request: Request, error: str = None) -> HTMLResponse:
     """
     Renders the login page with a CSRF token.
 
@@ -33,7 +34,7 @@ async def login_page(request: Request) -> HTMLResponse:
     """
     csrf_token = generate_csrf_token(request)
     return templates.TemplateResponse(
-        "login.html", {"request": request, "error": None, "csrf_token": csrf_token}
+        "login.html", {"request": request, "error": error, "csrf_token": csrf_token}
     )
 
 
@@ -62,9 +63,9 @@ async def login(
               and redirects to '/gradio'.
     """
     if not validate_csrf_token(csrf_token, request):
-        return templates.TemplateResponse(
-            "login.html", {"request": request, "error": "Invalid CSRF token"}
-        )
+        url = URL("/login").include_query_params(error="Invalid CSRF token")
+        return RedirectResponse(url, status_code=303)
+
     user = authenticate_user(username, password)
     if user:
         access_token, session_id = create_session_token(
