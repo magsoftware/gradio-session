@@ -16,8 +16,58 @@ These limitations become roadblocks when building multi‑tenant, secure dashboa
 ## Proposed Solution
 To overcome the limitations of Gradio’s built-in state and authentication mechanisms, the Gradio‑Session framework introduces a more modular and scalable approach that integrates FastAPI with external session handling. The solution is built on three core pillars:
 
+### Architecture
+
+```
+                       ┌────────────────────┐
+                       │      User          │
+                       └────────┬───────────┘
+                                │
+                      HTTP/WebSocket
+                                │
+                       ┌────────▼─────────┐
+                       │   Load Balancer  │  ◄──── Sticky Sessions (optional)
+                       └─────┬──────┬─────┘
+                             │      │
+                    ┌────────▼┐  ┌──▼────────┐
+                    │ Gradio  │  │  Gradio   │  ◄──── Stateless (does not use in-memory gr.State)
+                    │Instance │  │ Instance  │
+                    └─────────┘  └───────-───┘
+                          │            │
+                          └────┬───────┘
+                               │
+                  ┌────────────▼────────────┐
+                  │         Redis           │  ◄──── Stores user session/state
+                  └─────────────────────────┘
+
+                  ┌────────────┐   ┌────────────┐
+                  │  Backend   │   │  Model API │  ◄──── Optional: model serving
+                  └────────────┘   └────────────┘
+
+                  ┌──────────────────────────────┐
+                  │     Object Storage (S3, etc.)│  ◄──── Stores files, logs, data
+                  └──────────────────────────────┘
+```
+
 ### Authentication Powered by FastAPI
 Instead of relying on any client-side or simplistic user identification methods, Gradio‑Session uses FastAPI to implement robust user authentication workflows. These include fully functional login and registration endpoints that issue JWT tokens upon successful authentication. These tokens encode essential information like the user_id and a unique session_id, and serve as the foundation for secure, stateless user identification. Additionally, the framework supports role-based access control, enabling fine-grained permissions linked to users stored in a JSON file or a more scalable SQL database.
+
+```
+┌───────────────┐
+│ JWT Token     │
+│ ┌───────────┐ │
+│ │ session_id│ │◀───┐
+│ │ user_id   │ │    │
+│ └───────────┘ │    │
+└───────────────┘    │
+                     ▼
+        ┌────────────────────────┐
+        │ sessions (in Redis /   │
+        │ in‑memory dict)        │
+        │ { session_id: { ... }  │
+        └────────────────────────┘
+
+```
 
 This approach separates user management logic from the Gradio interface entirely, providing a clean and secure backend layer that can evolve independently of the UI.
 
@@ -26,10 +76,40 @@ Gradio‑Session moves beyond the constraints of gr.State by managing user sessi
 
 What makes this solution powerful is its pluggability. The session layer is abstracted in such a way that developers can swap the in-memory implementation for production-grade alternatives like Redis, SQL, or any other backend. This design allows applications to remain stateless, significantly simplifying scaling across multiple processes or containers in distributed environments.
 
+```
+┌──────────────────────────────┐
+│    InMemorySessionStore      │
+│     (self._store: dict)      │
+└──────────────────────────────┘
+              │
+              ▼
+┌────────────────────────────────────────────────────────┐
+│   session_id (str)     |         session data          │
+├────────────────────────┬───────────────────────────────┤
+│      "sess10"          │    {"data": {...},            |
+|                        |     "username": user1         │
+│                        │     "expire_at": <timestamp>} │
+├────────────────────────┼───────────────────────────────┤
+│      "sess11"          │    {"data": {...},            │
+|                        |     "username": user2         │
+│                        │     "expire_at": <timestamp>} │
+└────────────────────────┴───────────────────────────────┘
+```
+
 ### Seamless Session Injection into Gradio
 While FastAPI handles authentication and session storage, Gradio‑Session ensures that each user’s session data is made available to Gradio component callbacks through middleware. When a request reaches the application, FastAPI middleware extracts the JWT from the headers, decodes the token, and retrieves the associated session. This session is then injected into the Gradio function handlers as a regular Python dictionary.
 
 This mechanism allows Gradio apps to easily implement features like user-specific history, model inputs/outputs, preferences, or any stateful interaction—without depending on browser-local or frontend-managed storage. It preserves the simplicity of writing Gradio interfaces while adding the robustness of enterprise-ready session logic.
+
+### Request flow
+
+```
+[ User ] → [ FastAPI ˙JWT auth˙ ] → [ Session Store ]
+                         │
+                         └── mounts → [ Gradio App ]
+                                 ↕️ session access via middleware ──→ Gradio component functions
+
+```
 
 ## Implementation andKey Modules
 
