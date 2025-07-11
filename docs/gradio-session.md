@@ -25,18 +25,22 @@ To overcome the limitations of Gradio’s built-in state and authentication mech
                                 │
                       HTTP/WebSocket
                                 │
-                       ┌────────▼─────────┐
+                                ▼
+                       ┌──────────────────┐
                        │   Load Balancer  │  ◄──── Sticky Sessions (optional)
                        └─────┬──────┬─────┘
                              │      │
-                    ┌────────▼┐  ┌──▼────────┐
+                             │      |
+                             ▼      ▼
+                    ┌─────────┐  ┌───────────┐
                     │ Gradio  │  │  Gradio   │  ◄──── Stateless (does not use in-memory gr.State)
                     │Instance │  │ Instance  │
                     └─────────┘  └───────-───┘
                           │            │
                           └────┬───────┘
                                │
-                  ┌────────────▼────────────┐
+                               ▼
+                  ┌─────────────────────────┐
                   │         Redis           │  ◄──── Stores user session/state
                   └─────────────────────────┘
 
