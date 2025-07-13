@@ -1,5 +1,7 @@
 # FastAPI + Gradio Session Template
 
+See: [Article on medium.com](https://medium.com/@marek.gmyrek/gradio-from-prototype-to-production-secure-scalable-gradio-apps-for-data-scientists-739cebaf669b) 
+
 ## Introduction
 
 This project is a robust template for building modern web applications using **FastAPI** and **Gradio**.
