@@ -12,6 +12,7 @@ class InMemorySessionStore:
 
     Attributes:
         _store (dict): Internal dictionary to store session data.
+        _lock (threading.RLock): Reentrant lock for thread-safe access to the session store.
         _ttl (int): Time-to-live for each session in seconds.
         _cleanup_interval (int): Interval in seconds for running the cleanup thread.
         _stop_cleanup_thread (threading.Event): Event to signal the cleanup thread to stop.
@@ -58,6 +59,7 @@ class InMemorySessionStore:
         Starts a background thread to periodically remove expired sessions.
         """
         self._store = {}
+        self._lock = threading.RLock()
         self._ttl = ttl  # Default TTL for sessions in seconds
         self._cleanup_interval = cleanup_interval
         self._stop_cleanup_thread = threading.Event()
@@ -81,13 +83,15 @@ class InMemorySessionStore:
             dict[str, Any]: The session data stored, including username, data, and expiration timestamp.
         """
         expire_at = time.time() + self._ttl
-        self._store[session_id] = {
+        session_data = {
             "username": username,
             "data": data,
             "expire_at": expire_at,
         }
-        logger.debug(self._format_session(session_id, self._store[session_id]))
-        return self._store[session_id]
+        with self._lock:
+            self._store[session_id] = session_data
+        logger.debug(self._format_session(session_id, session_data))
+        return session_data
 
     def get_session(self, session_id: str) -> Optional[dict]:
         """
@@ -104,16 +108,20 @@ class InMemorySessionStore:
             - If the session has expired, it is removed from the store.
             - If the session is valid, its expiration time (TTL) is reset.
         """
-        session = self._store.get(session_id)
-        if not session:
-            return None
-        if session["expire_at"] < time.time():
-            self._store.pop(session_id, None)
-            return None
-        # Reset TTL
-        session["expire_at"] = time.time() + self._ttl
-        logger.debug(self._format_session(session_id, session))
-        return session
+        current_time = time.time()
+        with self._lock:
+            session = self._store.get(session_id)
+            if not session:
+                return None
+            if session["expire_at"] < current_time:
+                self._store.pop(session_id, None)
+                return None
+            # Reset TTL
+            session["expire_at"] = current_time + self._ttl
+            # Copy session data before releasing lock
+            session_data = session.copy()
+        logger.debug(self._format_session(session_id, session_data))
+        return session_data
 
     def delete_session(self, session_id: str) -> None:
         """
@@ -125,7 +133,8 @@ class InMemorySessionStore:
         Returns:
             None
         """
-        self._store.pop(session_id, None)
+        with self._lock:
+            self._store.pop(session_id, None)
         logger.debug(f"Session deleted: {session_id}")
 
     def dump_session(self, session_id: str) -> str:
@@ -138,10 +147,13 @@ class InMemorySessionStore:
         Returns:
             str: The formatted session data as a string. Returns an empty string if the session does not exist.
         """
-        session = self._store.get(session_id)
-        if not session:
-            return ""
-        s = self._format_session(session_id, session)
+        with self._lock:
+            session = self._store.get(session_id)
+            if not session:
+                return ""
+            # Copy session data before releasing lock
+            session_data = session.copy()
+        s = self._format_session(session_id, session_data)
         logger.debug(s)
         return s
 
@@ -156,9 +168,15 @@ class InMemorySessionStore:
         Returns:
             str: A formatted string listing all sessions in the store.
         """
+        with self._lock:
+            # Copy all sessions data before releasing lock
+            sessions_data = {
+                session_id: session.copy()
+                for session_id, session in self._store.items()
+            }
         sessions = [
             self._format_session(session_id, session)
-            for session_id, session in self._store.items()
+            for session_id, session in sessions_data.items()
         ]
         s = "Session store:\n" + "\n".join(sessions)
         logger.debug(s)
@@ -194,13 +212,16 @@ class InMemorySessionStore:
         """
         while not self._stop_cleanup_thread.is_set():
             current_time = time.time()
-            expired_sessions = [
-                session_id
-                for session_id, session in self._store.items()
-                if session["expire_at"] < current_time
-            ]
+            with self._lock:
+                expired_sessions = [
+                    session_id
+                    for session_id, session in self._store.items()
+                    if session["expire_at"] < current_time
+                ]
+                for session_id in expired_sessions:
+                    self._store.pop(session_id, None)
+            # Log outside the lock
             for session_id in expired_sessions:
-                self._store.pop(session_id, None)
                 logger.debug(f"Expired session removed: {session_id}")
             time.sleep(self._cleanup_interval)
 
