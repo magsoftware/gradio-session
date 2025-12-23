@@ -122,144 +122,182 @@ This mechanism allows Gradio apps to easily implement features like user-specifi
 
 ```
 .
-├── core
-│   ├── __init__.py
-│   ├── logging.py
-│   └── session.py
-├── main.py
-├── middleware
-│   ├── __init__.py
-│   ├── auth.py
-│   ├── logging.py
-│   ├── session.py
-│   └── utils.py
-├── pyproject.toml
+├── src/
+│   └── gradioapp/              # Main application package
+│       ├── __init__.py
+│       ├── main.py             # Application entry point
+│       ├── config.py            # Settings (dataclass-based)
+│       ├── api/                 # FastAPI layer
+│       │   ├── __init__.py
+│       │   ├── middleware/      # FastAPI middleware
+│       │   │   ├── __init__.py
+│       │   │   ├── auth.py      # JWT authentication middleware
+│       │   │   ├── session.py   # Session injection middleware
+│       │   │   ├── logging.py   # Request/response logging
+│       │   │   └── utils.py     # Helper functions (path matching, response creation)
+│       │   └── routes/          # API endpoints
+│       │       ├── __init__.py
+│       │       ├── login.py     # Login/logout endpoints
+│       │       ├── home.py      # Homepage route
+│       │       ├── health.py    # Health check endpoint
+│       │       └── static.py    # Static file serving
+│       ├── domain/              # Business logic layer
+│       │   ├── __init__.py
+│       │   ├── auth.py          # JWT token creation/verification
+│       │   ├── user.py          # User model and authentication
+│       │   ├── csrf.py          # CSRF protection
+│       │   └── session/         # Session management
+│       │       ├── __init__.py
+│       │       ├── types.py     # SessionData TypedDict
+│       │       ├── store.py     # SessionStore protocol
+│       │       ├── helpers.py  # Session helper functions
+│       │       └── backends/    # Session backend implementations
+│       │           ├── __init__.py
+│       │           └── memory.py # InMemorySessionStore
+│       ├── core/                # Core utilities
+│       │   ├── __init__.py
+│       │   └── logging.py      # Loguru logging setup
+│       ├── ui/                  # Gradio UI components
+│       │   ├── __init__.py
+│       │   ├── gradio_app.py   # Main Gradio interface
+│       │   ├── javascript.py    # JS interceptors for 401 handling
+│       │   ├── navbar.py        # Navigation components
+│       │   └── pages/          # Page definitions
+│       │       ├── __init__.py
+│       │       ├── base.py     # BasePage and BaseTab classes
+│       │       └── home_page.py # HomePage implementation
+│       ├── templates/           # Jinja2 HTML templates
+│       │   ├── base.html
+│       │   ├── home.html
+│       │   └── login.html
+│       └── static/             # Static assets
+│           └── manifest.json
+├── tests/                      # Test suite
+│   ├── __init__.py
+│   ├── conftest.py
+│   ├── test_auth.py
+│   ├── test_config.py
+│   ├── test_session_memory.py
+│   └── test_user.py
+├── docs/                       # Documentation
+├── pyproject.toml              # Project configuration
 ├── README.md
-├── routes
-│   ├── __init__.py
-│   ├── health.py
-│   ├── home.py
-│   ├── login.py
-│   └── static.py
-├── services
-│   ├── __init__.py
-│   ├── auth.py
-│   ├── csrf.py
-│   └── database.py
-├── session
-│   ├── __init__.py
-│   ├── database_session.py
-│   ├── inmemory_session.py
-│   ├── redis_session.py
-│   └── session_store.py
-├── settings
-│   ├── __init__.py
-│   └── base.py
-├── static
-│   └── manifest.json
-├── templates
-│   ├── base.html
-│   ├── home.html
-│   └── login.html
-├── ui
-│   ├── __init__.py
-│   ├── gradio_app.py
-│   ├── javascript.py
-│   ├── navbar.py
-│   └── pages
-│       ├── __init__.py
-│       ├── base_page.py
-│       ├── base_tab.py
-│       └── home_page.py
 └── uv.lock
 ```
 
-#### core/
-Contains core utilities and abstractions:
-
-- logging.py: Loguru custom logging setup.
-- session.py: Helper functions for session management.
-
-#### middleware/
+#### src/gradioapp/api/middleware/
 FastAPI middleware logic:
 
-- auth.py: JWT extraction and validation middleware.
-- session.py: Injects session context into requests.
-- logging.py: Request/response logging hooks.
+- **auth.py**: JWT extraction and validation middleware. Automatically redirects browser requests to `/login` on authentication failure, while API requests receive JSON responses.
+- **session.py**: Injects session context into requests. Validates session existence and expiration.
+- **logging.py**: Request/response logging hooks with performance metrics.
+- **utils.py**: Utility functions including:
+  - `is_path_allowed()`: Checks if a path should bypass authentication
+  - `is_browser_request()`: Detects browser vs API requests
+  - `create_unauthorized_response()`: Creates appropriate 401 responses (RedirectResponse for browsers, JSONResponse for API)
 
-#### routes/
+#### src/gradioapp/api/routes/
 Defines API endpoints (as FastAPI routers):
 
-- login.py: Handles login/logout process.
-- home.py: Base routes for the homepage (not used).
-- health.py: Health-check endpoint.
-- static.py: Serves static files (`/manifest.json`)
+- **login.py**: Handles login/logout process with CSRF protection.
+- **home.py**: Homepage route (serves HTML template).
+- **health.py**: Health-check endpoint (`/healthz`).
+- **static.py**: Serves static files (`/manifest.json`).
 
-#### services/
-Encapsulates reusable services and integrations:
+#### src/gradioapp/domain/
+Business logic layer:
 
-- auth.py: Authentication logic, JWT token creation and verification.
-- csrf.py: CSRF protection utilities (for the login form).
-- database.py: Abstraction for user database access (here simple Python dictionary, can be replaced by any other production implementation).
+- **auth.py**: JWT token creation and verification with TypedDict payloads.
+- **user.py**: User model with password hashing (bcrypt) and authentication logic.
+- **csrf.py**: CSRF protection utilities for form submissions.
+- **session/**: Session management:
+  - **types.py**: `SessionData` TypedDict definition
+  - **store.py**: `SessionStore` protocol interface
+  - **helpers.py**: Helper functions for session access (`get_session_id`, `get_session`)
+  - **backends/memory.py**: Default in-memory session store implementation
 
-#### session/
-Plug-and-play session backends:
+#### src/gradioapp/core/
+Core utilities:
 
-- session_store.py: Unified interface, Python Protocol class.
-- inmemory_session.py: Default in-memory implementation.
-- redis_session.py: Redis-backed session store (empty implementation).
-- database_session.py: SQL session store (empty implementation).
+- **logging.py**: Loguru custom logging setup and configuration.
 
-#### ui/
+#### src/gradioapp/ui/
 Gradio UI logic:
 
-- gradio_app.py: Main Gradio interface (with mounting logic).
-- navbar.py: Reusable navigation components.
-- javascript.py: Custom JS scripts. Defines fetch interceptor for handling 401 Unauthorized responses. Eg. if the user's session expires, we return 401 and this interceptor is responsible for redirecting the user to the login page.
+- **gradio_app.py**: Main Gradio interface creation function.
+- **navbar.py**: Reusable navigation components (logout button).
+- **javascript.py**: Custom JS scripts. Defines fetch interceptor for handling 401 Unauthorized responses. If the user's session expires, the server returns 401 and this interceptor redirects the user to the login page.
 
-#### ui/pages/
+#### src/gradioapp/ui/pages/
+Page definitions:
 
-Individual pages or tabs like home_page.py, base_page.py.
+- **base.py**: Abstract base classes `BasePage` and `BaseTab` for consistent page structure.
+- **home_page.py**: HomePage implementation with tabs.
 
-#### settings/
-Centralized app configuration:
+#### src/gradioapp/config.py
+Centralized app configuration using dataclasses:
 
-- base.py: App settings, environment flags, secrets.
+- `Settings` dataclass with validation (e.g., JWT_SECRET minimum length)
+- Environment variable loading with `load_settings()`
+- Frozen dataclass for immutability
 
-#### templates/ and static/
+#### src/gradioapp/templates/ and src/gradioapp/static/
 Used for rendering HTML responses via Jinja2 (outside Gradio), and static assets (e.g. manifest.json for frontend).
 
-#### root Files:
-`main.py`: App entry point:
+#### src/gradioapp/main.py
+Application entry point:
 
-- configurec Loguru logging,
-- initializes session store (InMemorySessionStore),
-- sets up FastAPI,
-- adds middlware for authenticatio, session and logging,
-- mounts all routes,
-- mounts Gradio application,
-- starts the application.
+- Configures Loguru logging
+- Initializes session store (InMemorySessionStore)
+- Sets up FastAPI application
+- Adds middleware for authentication, session, and logging
+- Mounts all routes
+- Mounts Gradio application at `/gradio`
+- Starts the application with uvicorn
 
 The architecture of Gradio‑Session is deliberately modular, making it easy to understand, extend, and maintain. Each component serves a specific purpose—from user authentication to session persistence—working together to provide a robust backend environment for Gradio-based applications. Below is a closer look at the core modules and how they contribute to the overall system.
 
 ### Authentication and Authorization Layer
 This module handles the entire lifecycle of user authentication. It defines FastAPI routes for login and logout. When a user successfully logs in, a JWT token is generated, containing claims like user_id, session_id, and expiration metadata.
 
-The authentication logic also supports role-based access control, which is essential for applications that require permission levels (e.g. admin vs. user). User credentials are initially stored in a JSON file for simplicity, but the design supports swapping this out for SQL or any persistent data store. Passwords are securely hashed, typically using bcrypt, ensuring that even in simple setups, security is taken seriously.
+The authentication system uses:
+- **JWT tokens** with TypedDict payloads for type safety (`TokenPayload`)
+- **Password hashing** using bcrypt for secure password storage
+- **CSRF protection** for form submissions using `itsdangerous`
+- **Secure cookies** with `Secure` and `SameSite` attributes
+
+The authentication logic also supports role-based access control, which is essential for applications that require permission levels (e.g. admin vs. user). User credentials are stored in an in-memory dictionary by default, but the design supports swapping this out for SQL or any persistent data store.
 
 By isolating this logic from the UI, the application achieves a clean separation of concerns and aligns with best practices in modern web security.
 
 ### Stateless Session Management
 Session handling is abstracted into its own module to promote flexibility and scalability. At its core is a session store—by default, a Python dictionary mapping session_id values to individual session states (themselves represented as dictionaries).
 
+Session data is defined using TypedDict (`SessionData`) for type safety, ensuring consistent structure across the application. The session store interface is defined as a Python Protocol class (`SessionStore`), making it easy to swap implementations.
+
 This setup allows you to store arbitrary user-specific data like model inputs, conversation history, user preferences, or application state between interactions.
 
-Importantly, the session layer is designed to be backend-agnostic. Session store interface is defined as Python Protocol class. You can replace the default in-memory dictionary with a persistent store like Redis, which is ideal for high-concurrency or distributed deployments. This external session handling decouples the application state from Gradio’s internal state mechanisms, making the entire system inherently stateless and cloud-native.
+**Thread Safety**: The default `InMemorySessionStore` uses `RLock` (reentrant lock) to ensure thread-safe operations, with minimal lock duration for optimal performance.
+
+**TTL and Cleanup**: Sessions have configurable TTL (time-to-live) and automatic cleanup of expired sessions via a background thread.
+
+Importantly, the session layer is designed to be backend-agnostic. You can replace the default in-memory dictionary with a persistent store like Redis, which is ideal for high-concurrency or distributed deployments. This external session handling decouples the application state from Gradio's internal state mechanisms, making the entire system inherently stateless and cloud-native.
 
 ### Middleware and User Context Injection
 To make session and user data accessible across the app, Gradio‑Session uses FastAPI middleware. Every incoming request is intercepted, and the middleware extracts and decodes the JWT token from the cookie.
 
-Based on the decoded token, it reconstructs the session using the session backend and attaches it to the request’s state. This makes user identity and session information available to every downstream route or component—including Gradio callback functions—without explicitly passing them through the UI.
+The middleware stack consists of three layers (executed in reverse order of addition):
+1. **LoggingMiddleware**: Logs all requests with timing and status information
+2. **AuthMiddleware**: Validates JWT tokens and extracts user/session IDs
+3. **SessionMiddleware**: Validates session existence and injects session data
+
+Based on the decoded token, the middleware reconstructs the session using the session backend and attaches it to the request's state. This makes user identity and session information available to every downstream route or component—including Gradio callback functions—without explicitly passing them through the UI.
+
+**Smart Response Handling**: The middleware intelligently handles authentication failures:
+- **Browser requests** (Accept: text/html): Automatically redirects to `/login` using HTTP 302
+- **API requests** (Accept: application/json): Returns JSON response with error details and `redirect_to` field
+
+This dual-mode approach ensures seamless user experience for both web browsers and programmatic API clients.
 
 This layer plays a crucial role in securely and efficiently bridging authentication with session logic.
 
