@@ -5,6 +5,7 @@ from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from loguru import logger
+from pydantic import BaseModel, Field
 from starlette.datastructures import URL
 
 from ...domain.auth import create_session_token, verify_token
@@ -16,6 +17,14 @@ router = APIRouter()
 
 BASE_DIR = Path(__file__).parent.parent.parent
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+
+
+class LoginForm(BaseModel):
+    """Validation model for login form data."""
+
+    username: str = Field(..., min_length=1, max_length=255, description="Username or email")
+    password: str = Field(..., min_length=1, max_length=255, description="Password")
+    csrf_token: str = Field(..., min_length=1, description="CSRF token")
 
 
 @router.get("/login", name="login", response_class=HTMLResponse, response_model=None)
@@ -47,23 +56,36 @@ async def login(
 
     Args:
         request (Request): The incoming HTTP request object.
-        username (str): The username submitted via form data.
-        password (str): The password submitted via form data.
+        username (str): The username submitted via form data (1-255 characters).
+        password (str): The password submitted via form data (1-255 characters).
         csrf_token (str): The CSRF token submitted via form data.
 
     Returns:
         HTMLResponse:
             - If CSRF token is invalid, returns a rendered login template with an error message.
             - If authentication fails, returns a rendered login template with an error message.
+            - If validation fails, returns a rendered login template with an error message.
         RedirectResponse:
             - If authentication is successful, creates a session, sets an access token cookie,
               and redirects to '/gradio'.
     """
-    if not validate_csrf_token(csrf_token, request):
+    # Validate form data
+    try:
+        form_data = LoginForm(
+            username=username, password=password, csrf_token=csrf_token
+        )
+    except Exception as e:
+        logger.warning(f"Login form validation failed: {e}")
+        return templates.TemplateResponse(
+            "login.html",
+            {"request": request, "error": "Invalid form data. Please check your input."},
+        )
+
+    if not validate_csrf_token(form_data.csrf_token, request):
         url = URL("/login").include_query_params(error="Invalid CSRF token")
         return RedirectResponse(url, status_code=303)
 
-    user = authenticate_user(username, password)
+    user = authenticate_user(form_data.username, form_data.password)
     if user:
         access_token, session_id = create_session_token(
             username, expires_delta=timedelta(minutes=30)
