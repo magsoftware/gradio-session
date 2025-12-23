@@ -45,7 +45,8 @@ app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 # Mount gradio app
 gr.mount_gradio_app(app, create_gradio_app(), path="/gradio")
 
-if __name__ == "__main__":
+def main() -> None:
+    """Main entry point for the application."""
     logger.info("Starting the application")
     uvicorn.run(
         "gradioapp.main:app",
@@ -54,3 +55,7 @@ if __name__ == "__main__":
         reload=RELOAD,
         log_config=None,  # Disable uvicorn's default logging
     )
+
+
+if __name__ == "__main__":
+    main()

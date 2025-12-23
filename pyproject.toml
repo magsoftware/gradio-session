@@ -31,6 +31,9 @@ dev = [
     "httpx>=0.27.0",
 ]
 
+[project.scripts]
+gradioapp = "gradioapp.main:main"
+
 [tool.ruff]
 lint.select = ["I"]   # "I" is the code for isort rules (import sorting)
 
