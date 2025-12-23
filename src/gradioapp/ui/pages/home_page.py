@@ -3,7 +3,6 @@ from loguru import logger
 
 from ...domain.session.helpers import get_session_id
 from ...domain.session.store import get_session_store
-
 from .base import BasePage, BaseTab
 
 

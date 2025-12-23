@@ -18,7 +18,8 @@ def generate_csrf_token(request: Request) -> str:
     Returns:
         str: A CSRF token string unique to the client's host.
     """
-    return serializer.dumps(request.client.host, salt=CSRF_SECRET)
+    host = request.client.host if request.client else "unknown"
+    return serializer.dumps(host, salt=CSRF_SECRET)
 
 
 def validate_csrf_token(token: str, request: Request) -> bool:
@@ -36,6 +37,7 @@ def validate_csrf_token(token: str, request: Request) -> bool:
         data = serializer.loads(
             token, salt=CSRF_SECRET, max_age=3600
         )  # Token valid for 1 hour
-        return data == request.client.host
+        host = request.client.host if request.client else "unknown"
+        return data == host
     except Exception:
         return False

@@ -36,4 +36,3 @@ class BaseTab(ABC):
     @abstractmethod
     def create_ui(self, tab_component: gr.Tab) -> None:
         pass
-

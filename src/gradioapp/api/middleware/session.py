@@ -1,3 +1,5 @@
+from typing import Awaitable, Callable
+
 from fastapi import Request, Response
 from loguru import logger
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -26,7 +28,9 @@ class SessionMiddleware(BaseHTTPMiddleware):
             if session validation fails.
     """
 
-    async def dispatch(self, request: Request, call_next) -> Response:
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
         logger.debug(f"Processing request: {request.method} {request.url.path}")
 
         if is_path_allowed(request.url.path):
@@ -38,16 +42,12 @@ class SessionMiddleware(BaseHTTPMiddleware):
         session_id = getattr(request.state, "session_id", None)
         if not session_id:
             logger.warning("Session ID not found in request state.")
-            return create_unauthorized_response(
-                request, "Missing session ID"
-            )
+            return create_unauthorized_response(request, "Missing session ID")
 
         session = get_session_store().get_session(session_id)
         if not session:
             logger.warning(f"Session data not found for session ID: {session_id}")
-            return create_unauthorized_response(
-                request, "Session expired or not found"
-            )
+            return create_unauthorized_response(request, "Session expired or not found")
 
         logger.debug(f"Session found retrieved for session {session_id}: {session}")
 

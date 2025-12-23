@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -44,6 +43,7 @@ app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 # Mount gradio app
 gr.mount_gradio_app(app, create_gradio_app(), path="/gradio")
+
 
 def main() -> None:
     """Main entry point for the application."""

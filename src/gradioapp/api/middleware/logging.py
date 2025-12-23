@@ -1,4 +1,5 @@
 import time
+from typing import Awaitable, Callable
 
 from fastapi import Request, Response
 from loguru import logger
@@ -24,7 +25,9 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             after processing, and ensures exceptions are logged with context.
     """
 
-    async def dispatch(self, request: Request, call_next) -> Response:
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
         start_time = time.perf_counter()
         method = request.method
         path = request.url.path

@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).parent.parent.parent
 
 
 @router.get("/manifest.json")
-async def manifest():
+async def manifest() -> FileResponse:
     """
     Asynchronously serves the manifest.json file from the static directory.
 

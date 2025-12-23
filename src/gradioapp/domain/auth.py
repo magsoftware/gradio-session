@@ -1,6 +1,6 @@
 import datetime
-import uuid
 from typing import TypedDict
+import uuid
 
 import jwt
 
@@ -26,7 +26,9 @@ class TokenPayload(TypedDict):
     iat: int
 
 
-def create_access_token(data: dict, expires_delta: datetime.timedelta) -> str:
+def create_access_token(
+    data: dict[str, str | int], expires_delta: datetime.timedelta
+) -> str:
     """
     Generates a JSON Web Token (JWT) access token with an expiration time.
 

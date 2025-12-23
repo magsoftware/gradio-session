@@ -45,16 +45,12 @@ class AuthMiddleware(BaseHTTPMiddleware):
         token = request.cookies.get("access_token")
         if not token:
             logger.warning("No access token found. Redirecting to /login.")
-            return create_unauthorized_response(
-                request, "Missing access token"
-            )
+            return create_unauthorized_response(request, "Missing access token")
 
         payload = verify_token(token)
         if not payload:
             logger.warning("Invalid access token. Redirecting to /login.")
-            return create_unauthorized_response(
-                request, "Invalid or expired token"
-            )
+            return create_unauthorized_response(request, "Invalid or expired token")
 
         request.state.user_id = payload.get("sub")
         request.state.session_id = payload.get("session_id")

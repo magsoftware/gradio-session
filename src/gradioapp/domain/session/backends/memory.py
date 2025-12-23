@@ -70,9 +70,7 @@ class InMemorySessionStore:
         )
         self._cleanup_thread.start()
 
-    def create_session(
-        self, session_id: str, username: str, data: dict
-    ) -> SessionData:
+    def create_session(self, session_id: str, username: str, data: dict) -> SessionData:
         """
         Creates a new session with the given session ID, username, and associated data.
 

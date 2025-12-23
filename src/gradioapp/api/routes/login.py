@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Any
+from pathlib import Path
 
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -12,9 +12,6 @@ from ...domain.csrf import generate_csrf_token, validate_csrf_token
 from ...domain.session.store import get_session_store
 from ...domain.user import authenticate_user
 
-import os
-from pathlib import Path
-
 router = APIRouter()
 
 BASE_DIR = Path(__file__).parent.parent.parent
@@ -22,7 +19,7 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 
 @router.get("/login", name="login", response_class=HTMLResponse, response_model=None)
-async def login_page(request: Request, error: str = None) -> HTMLResponse:
+async def login_page(request: Request, error: str | None = None) -> HTMLResponse:
     """
     Renders the login page with a CSRF token.
 

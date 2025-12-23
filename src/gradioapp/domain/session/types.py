@@ -14,4 +14,3 @@ class SessionData(TypedDict):
     username: str
     data: dict[str, Any]
     expire_at: float
-

@@ -1,5 +1,3 @@
-from typing import Optional
-
 import bcrypt
 
 # In-memory user database
@@ -21,7 +19,9 @@ class User:
         Returns:
             bool: True if the password matches, False otherwise.
         """
-        return bcrypt.checkpw(password.encode("utf-8"), self.password_hash.encode("utf-8"))
+        return bcrypt.checkpw(
+            password.encode("utf-8"), self.password_hash.encode("utf-8")
+        )
 
 
 def hash_password(password: str) -> str:
@@ -41,12 +41,16 @@ def init_user_db() -> None:
     """Initialize the user database with some sample users."""
     global user_db
     user_db = {
-        "john@test.com": User(username="john@test.com", password_hash=hash_password("secret")),
-        "jane@test.com": User(username="jane@test.com", password_hash=hash_password("secret")),
+        "john@test.com": User(
+            username="john@test.com", password_hash=hash_password("secret")
+        ),
+        "jane@test.com": User(
+            username="jane@test.com", password_hash=hash_password("secret")
+        ),
     }
 
 
-def authenticate_user(username: str, password: str) -> Optional[User]:
+def authenticate_user(username: str, password: str) -> User | None:
     """
     Authenticate a user by verifying the provided username and password.
 
