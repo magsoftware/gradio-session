@@ -76,10 +76,16 @@ class TestLoginRoute:
         """Test successful login."""
         client = TestClient(app)
 
-        # Mock CSRF token validation
+        # Mock CSRF token validation and user authentication
         with patch(
             "gradioapp.api.routes.login.validate_csrf_token", return_value=True
-        ):
+        ), patch(
+            "gradioapp.api.routes.login.authenticate_user"
+        ) as mock_auth:
+            # Mock successful authentication
+            mock_user = User(username="admin", password_hash="hashed")
+            mock_auth.return_value = mock_user
+
             response = client.post(
                 "/login",
                 data={
@@ -87,10 +93,14 @@ class TestLoginRoute:
                     "password": "admin",
                     "csrf_token": "test_token",
                 },
+                follow_redirects=False,
             )
 
             # Should redirect to /gradio
-            assert response.status_code in [302, 303]
+            assert response.status_code in [302, 303], f"Expected redirect, got {response.status_code}"
+            # Check if redirect location is /gradio
+            if response.status_code in [302, 303]:
+                assert "/gradio" in str(response.headers.get("location", ""))
             assert "access_token" in response.cookies
 
     def test_login_invalid_credentials(self, app, test_user):
