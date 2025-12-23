@@ -1,10 +1,9 @@
 from fastapi import Request, Response
-from fastapi.responses import JSONResponse
 from loguru import logger
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from ...domain.session.store import get_session_store
-from .utils import is_path_allowed
+from .utils import create_unauthorized_response, is_path_allowed
 
 
 class SessionMiddleware(BaseHTTPMiddleware):
@@ -39,20 +38,15 @@ class SessionMiddleware(BaseHTTPMiddleware):
         session_id = getattr(request.state, "session_id", None)
         if not session_id:
             logger.warning("Session ID not found in request state.")
-            return JSONResponse(
-                status_code=401,
-                content={"error": "Missing session ID", "redirect_to": "/login"},
+            return create_unauthorized_response(
+                request, "Missing session ID"
             )
 
         session = get_session_store().get_session(session_id)
         if not session:
             logger.warning(f"Session data not found for session ID: {session_id}")
-            return JSONResponse(
-                status_code=401,
-                content={
-                    "error": "Session expired or not found",
-                    "redirect_to": "/login",
-                },
+            return create_unauthorized_response(
+                request, "Session expired or not found"
             )
 
         logger.debug(f"Session found retrieved for session {session_id}: {session}")

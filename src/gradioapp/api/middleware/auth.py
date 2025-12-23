@@ -1,12 +1,11 @@
 from typing import Awaitable, Callable
 
 from fastapi import Request, Response
-from fastapi.responses import JSONResponse
 from loguru import logger
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from ...domain.auth import verify_token
-from .utils import is_path_allowed
+from .utils import create_unauthorized_response, is_path_allowed
 
 
 class AuthMiddleware(BaseHTTPMiddleware):
@@ -46,17 +45,15 @@ class AuthMiddleware(BaseHTTPMiddleware):
         token = request.cookies.get("access_token")
         if not token:
             logger.warning("No access token found. Redirecting to /login.")
-            return JSONResponse(
-                status_code=401,
-                content={"error": "Missing access token", "redirect_to": "/login"},
+            return create_unauthorized_response(
+                request, "Missing access token"
             )
 
         payload = verify_token(token)
         if not payload:
             logger.warning("Invalid access token. Redirecting to /login.")
-            return JSONResponse(
-                status_code=401,
-                content={"error": "Invalid or expired token", "redirect_to": "/login"},
+            return create_unauthorized_response(
+                request, "Invalid or expired token"
             )
 
         request.state.user_id = payload.get("sub")
