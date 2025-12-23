@@ -27,7 +27,8 @@ def app():
 @pytest.fixture
 def session_store():
     """Create a fresh in-memory session store for testing."""
-    store = InMemorySessionStore(ttl=300, cleanup_interval=60)
+    # Use shorter cleanup_interval for faster test teardown
+    store = InMemorySessionStore(ttl=300, cleanup_interval=1)
     initialize_session_store(store)
     yield store
     store.stop_cleanup_thread()

@@ -228,14 +228,21 @@ class InMemorySessionStore:
             # Log outside the lock
             for session_id in expired_sessions:
                 logger.debug(f"Expired session removed: {session_id}")
-            time.sleep(self._cleanup_interval)
+            # Use wait with timeout instead of sleep to allow faster shutdown
+            if self._stop_cleanup_thread.wait(timeout=self._cleanup_interval):
+                # Event was set, exit loop
+                break
 
-    def stop_cleanup_thread(self) -> None:
+    def stop_cleanup_thread(self, timeout: float | None = None) -> None:
         """
         Stops the background cleanup thread by signaling it to terminate and waiting for it to finish.
 
         This method sets an internal event to notify the cleanup thread to stop, and then joins the
         thread to ensure it has completed execution before proceeding.
+
+        Args:
+            timeout (float | None): Maximum time to wait for thread to finish in seconds.
+                If None, waits indefinitely. Defaults to None.
         """
         self._stop_cleanup_thread.set()
-        self._cleanup_thread.join()
+        self._cleanup_thread.join(timeout=timeout)
