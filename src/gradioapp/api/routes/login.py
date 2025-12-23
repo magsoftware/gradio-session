@@ -113,10 +113,11 @@ async def logout(request: Request) -> RedirectResponse:
         if payload:
             # Invalidate the session
             session_id = payload.get("session_id")
-            get_session_store().delete_session(session_id)
-            logger.info(
-                f"Logout: session {session_id} for the user {payload.get('sub')} invalidated"
-            )
+            if session_id:
+                get_session_store().delete_session(session_id)
+                logger.info(
+                    f"Logout: session {session_id} for the user {payload.get('sub')} invalidated"
+                )
 
     response = RedirectResponse(url="/login", status_code=303)
     response.delete_cookie("access_token", secure=True, samesite="lax")
