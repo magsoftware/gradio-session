@@ -11,6 +11,92 @@ and production-readiness, featuring middleware for authentication (JWT), HTTP se
 request logging. The default session backend is an in-memory store, but the architecture allows
 easy replacement with Redis or other backends.
 
+## Quick Start
+
+Get the application up and running in minutes:
+
+### Step 1: Install Dependencies
+
+Install all required dependencies using `uv`:
+
+```bash
+uv sync
+```
+
+This will:
+- Create a virtual environment (if not exists)
+- Install all project dependencies
+- Install development dependencies (pytest, etc.)
+
+### Step 2: Create Environment File
+
+Create a `.env` file in the project root with the following variables:
+
+```bash
+# Required: JWT secret key (minimum 32 characters)
+JWT_SECRET=your-super-secret-jwt-key-minimum-32-characters-long
+
+# Required: Application metadata
+VERSION=0.1.0
+PROJECTNAME=Gradio App
+
+# Optional: Secret keys for CSRF protection
+SECRET_KEY=your-secret-key-for-general-use
+CSRF_SECRET=your-csrf-secret-key
+
+# Optional: Development settings
+RELOAD=false
+HOME_AS_HTML=false
+```
+
+**Important:** The `JWT_SECRET` must be at least 32 characters long. Generate a secure secret:
+
+```bash
+# Generate a random 32+ character secret
+python3 -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+### Step 3: Run the Application
+
+After setting up the environment variables, start the application:
+
+```bash
+uv run gradioapp
+```
+
+Or using the script directly (after installing the package):
+
+```bash
+gradioapp
+```
+
+The application will start on `http://0.0.0.0:8080` (or `http://localhost:8080`).
+
+### Step 4: Access the Application
+
+1. Open your browser and navigate to `http://localhost:8080`
+2. You will be redirected to the login page
+3. Use the default test credentials:
+   - **Username:** `john@test.com`
+   - **Password:** `secret`
+
+Or:
+
+   - **Username:** `jane@test.com`
+   - **Password:** `secret`
+
+4. After successful login, you'll be redirected to the Gradio interface at `/gradio`
+
+### Development Mode
+
+For development with auto-reload on code changes, set `RELOAD=true` in your `.env` file:
+
+```bash
+RELOAD=true
+```
+
+Then run the application - it will automatically reload when you modify the code.
+
 ## Installation
 
 ### Prerequisites
@@ -18,53 +104,67 @@ easy replacement with Redis or other backends.
 - Python 3.13+
 - [uv](https://github.com/astral-sh/uv) package manager (recommended) or pip
 
-### Setup
+### Detailed Setup
 
-1. Clone the repository:
+1. **Clone the repository:**
 ```bash
 git clone <repository-url>
 cd gradio-session
 ```
 
-2. Install dependencies:
+2. **Install dependencies:**
 ```bash
 uv sync
 ```
 
-3. Set up environment variables:
+This installs all required packages and creates a virtual environment.
+
+3. **Create `.env` file:**
 ```bash
-cp .env.example .env  # If you have an example file
-# Or create .env with required variables:
-# JWT_SECRET=<your-secret-key-min-32-chars>
-# VERSION=0.1.0
-# PROJECTNAME=Gradio App
-# SECRET_KEY=<your-secret-key>
-# CSRF_SECRET=<your-csrf-secret>
+# Create .env file with required variables
+cat > .env << EOF
+JWT_SECRET=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))")
+VERSION=0.1.0
+PROJECTNAME=Gradio App
+SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))")
+CSRF_SECRET=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))")
+RELOAD=false
+EOF
+```
+
+Or manually create `.env` with:
+```bash
+JWT_SECRET=your-super-secret-jwt-key-minimum-32-characters-long
+VERSION=0.1.0
+PROJECTNAME=Gradio App
+SECRET_KEY=your-secret-key
+CSRF_SECRET=your-csrf-secret
+RELOAD=false
 ```
 
 ## Running the Application
 
-### Using the Script Command
+### Method 1: Using the Script Command (Recommended)
 
 After installing the package, you can run the application using:
-
-```bash
-gradioapp
-```
-
-Or with uv:
 
 ```bash
 uv run gradioapp
 ```
 
-### Using Python Module
+Or if the package is installed in your environment:
+
+```bash
+gradioapp
+```
+
+### Method 2: Using Python Module
 
 ```bash
 uv run python -m gradioapp.main
 ```
 
-### Using Uvicorn Directly
+### Method 3: Using Uvicorn Directly
 
 ```bash
 uv run uvicorn gradioapp.main:app --host 0.0.0.0 --port 8080
@@ -78,14 +178,14 @@ Set `RELOAD=true` in your `.env` file to enable auto-reload during development:
 RELOAD=true
 ```
 
-Then run the application - it will automatically reload on code changes.
+Then run the application - it will automatically reload when you modify the code.
 
 ## Default Credentials
 
 The application comes with sample users for testing:
 
-- Username: `john@test.com` / Password: `secret`
-- Username: `jane@test.com` / Password: `secret`
+- **Username:** `john@test.com` / **Password:** `secret`
+- **Username:** `jane@test.com` / **Password:** `secret`
 
 ## Project Structure
 
