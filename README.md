@@ -327,7 +327,9 @@ All middleware is registered in `main.py` and executed in a defined order.
 Each route is implemented as an APIRouter and included in the main FastAPI app. Endpoints
 are protected by middleware as appropriate.
 
-## Testing
+## Development Tools
+
+### Testing
 
 Run the test suite:
 
@@ -335,11 +337,83 @@ Run the test suite:
 uv run pytest tests/
 ```
 
+Run tests with verbose output:
+
+```bash
+uv run pytest tests/ -v
+```
+
 Run tests with coverage:
 
 ```bash
 uv run pytest tests/ --cov=gradioapp --cov-report=html
 ```
+
+Run a specific test file:
+
+```bash
+uv run pytest tests/test_auth.py -v
+```
+
+Run a specific test class or function:
+
+```bash
+uv run pytest tests/test_auth.py::TestCreateAccessToken -v
+```
+
+### Code Formatting and Linting
+
+#### Ruff
+
+Ruff is used for import sorting and code formatting.
+
+Check import sorting:
+
+```bash
+uv run ruff check src/gradioapp --select I
+```
+
+Fix import sorting automatically:
+
+```bash
+uv run ruff check --fix src/gradioapp --select I
+```
+
+Check code formatting:
+
+```bash
+uv run ruff format --check src/gradioapp
+```
+
+Format code automatically:
+
+```bash
+uv run ruff format src/gradioapp
+```
+
+#### Pylint
+
+Pylint is used for code quality checking.
+
+Run pylint on all source files:
+
+```bash
+uv run pylint src/gradioapp
+```
+
+Run pylint with specific output format:
+
+```bash
+uv run pylint src/gradioapp --output-format=text
+```
+
+Run pylint on a specific file:
+
+```bash
+uv run pylint src/gradioapp/main.py
+```
+
+The project is configured to achieve a 10.00/10 pylint score. Configuration is in `pyproject.toml` under `[tool.pylint]`.
 
 
 ## Summary
