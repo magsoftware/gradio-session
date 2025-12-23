@@ -18,7 +18,7 @@ class Tab1(BaseTab):
 
     def show_session(self, request: gr.Request) -> str:
         session_id = get_session_id(request)
-        logger.info(f"Showing session for session_id: {session_id}")
+        logger.debug(f"Showing session for session_id: {session_id}")
         return f"{get_session_store().dump_session(session_id)}"
 
 

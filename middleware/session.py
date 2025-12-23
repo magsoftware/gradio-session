@@ -28,17 +28,17 @@ class SessionMiddleware(BaseHTTPMiddleware):
     """
 
     async def dispatch(self, request: Request, call_next) -> Response:
-        logger.info(f"Processing request: {request.method} {request.url.path}")
+        logger.debug(f"Processing request: {request.method} {request.url.path}")
 
         if is_path_allowed(request.url.path):
-            logger.info(
+            logger.debug(
                 f"Path {request.url.path} matches allowed patterns. Skipping session middleware."
             )
             return await call_next(request)
 
         session_id = getattr(request.state, "session_id", None)
         if not session_id:
-            logger.info("Session ID not found in request state.")
+            logger.warning("Session ID not found in request state.")
             return JSONResponse(
                 status_code=401,
                 content={"error": "Missing session ID", "redirect_to": "/login"},
@@ -46,7 +46,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
 
         session = get_session_store().get_session(session_id)
         if not session:
-            logger.info(f"Session data not found for session ID: {session_id}")
+            logger.warning(f"Session data not found for session ID: {session_id}")
             return JSONResponse(
                 status_code=401,
                 content={

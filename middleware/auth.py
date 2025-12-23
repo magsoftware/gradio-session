@@ -35,10 +35,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
         request: Request,
         call_next: Callable[[Request], Awaitable[Response]],
     ) -> Response:
-        logger.info(f"Processing request: {request.method} {request.url.path}")
+        logger.debug(f"Processing request: {request.method} {request.url.path}")
 
         if is_path_allowed(request.url.path):
-            logger.info(
+            logger.debug(
                 f"Path {request.url.path} matches allowed patterns. Skipping auth."
             )
             return await call_next(request)
@@ -62,7 +62,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         request.state.user_id = payload.get("sub")
         request.state.session_id = payload.get("session_id")
 
-        logger.info(
+        logger.debug(
             f"Access token verified for user {request.state.user_id}, session_id {request.state.session_id}, proceeding with the request."
         )
 
