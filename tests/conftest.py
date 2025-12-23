@@ -8,9 +8,10 @@ os.environ.setdefault("JWT_SECRET", "a" * 32)  # Minimum 32 characters
 os.environ.setdefault("VERSION", "test")
 os.environ.setdefault("PROJECTNAME", "test")
 
-from services.auth import create_access_token, verify_token
-from session import InMemorySessionStore, initialize_session_store
-from settings.base import load_settings
+from gradioapp.domain.auth import create_access_token, verify_token
+from gradioapp.domain.session.backends.memory import InMemorySessionStore
+from gradioapp.domain.session.store import initialize_session_store
+from gradioapp.config import load_settings
 
 
 @pytest.fixture

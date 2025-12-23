@@ -1,6 +1,11 @@
 import pytest
 
-from services.database import User, authenticate_user, hash_password, init_user_db
+from gradioapp.domain.user import (
+    User,
+    authenticate_user,
+    hash_password,
+    init_user_db,
+)
 
 
 class TestHashPassword:

@@ -2,7 +2,7 @@ import time
 
 import pytest
 
-from session import InMemorySessionStore
+from gradioapp.domain.session.backends.memory import InMemorySessionStore
 
 
 @pytest.mark.skip(reason="TestInMemorySessionStore tests disabled")

@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from settings.base import Settings, load_settings
+from gradioapp.config import Settings, load_settings
 
 
 class TestSettings:

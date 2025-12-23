@@ -2,8 +2,12 @@ from datetime import timedelta
 
 import pytest
 
-from services.auth import create_access_token, create_session_token, verify_token
-import settings
+from gradioapp.domain.auth import (
+    create_access_token,
+    create_session_token,
+    verify_token,
+)
+from gradioapp.config import JWT_SECRET
 
 
 class TestCreateAccessToken:
@@ -96,13 +100,7 @@ class TestVerifyToken:
         expires_delta = timedelta(minutes=30)
         token = create_access_token(data, expires_delta)
 
-        # Temporarily change secret
-        original_secret = settings.JWT_SECRET
-        try:
-            # This won't work because settings is frozen, but test the concept
-            payload = verify_token(token)
-            # Should still work with original secret
-            assert payload is not None
-        finally:
-            pass  # Settings is frozen, so we can't change it
+        # Token should verify with current secret
+        payload = verify_token(token)
+        assert payload is not None
 
