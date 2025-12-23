@@ -118,6 +118,8 @@ class TestLoginRoute:
 
         with patch(
             "gradioapp.api.routes.login.validate_csrf_token", return_value=False
+        ), patch(
+            "gradioapp.api.routes.login.generate_csrf_token", return_value="test_token"
         ):
             response = client.post(
                 "/login",
@@ -126,10 +128,15 @@ class TestLoginRoute:
                     "password": "admin",
                     "csrf_token": "invalid_token",
                 },
+                follow_redirects=False,
             )
 
             # Should redirect with error
             assert response.status_code in [302, 303]
+            # Check if redirect includes error parameter
+            if response.status_code in [302, 303]:
+                location = str(response.headers.get("location", ""))
+                assert "/login" in location or "error" in location.lower()
 
     def test_login_validation_error(self, app):
         """Test login with invalid form data (too long username)."""
@@ -169,29 +176,36 @@ class TestLogoutRoute:
         client = TestClient(app)
         # Set cookie on client instead of per-request
         client.cookies.set("access_token", token)
-        response = client.get("/logout")
+        response = client.get("/logout", follow_redirects=False)
 
         # Should redirect to login
         assert response.status_code in [302, 303]
+        # Check redirect location
+        if response.status_code in [302, 303]:
+            assert "/login" in str(response.headers.get("location", ""))
         # Session should be deleted
         assert session_store.get_session(session_id) is None
 
     def test_logout_without_token(self, app):
         """Test logout without token."""
         client = TestClient(app)
-        response = client.get("/logout")
+        response = client.get("/logout", follow_redirects=False)
 
         # Should still redirect to login
         assert response.status_code in [302, 303]
+        if response.status_code in [302, 303]:
+            assert "/login" in str(response.headers.get("location", ""))
 
     def test_logout_with_invalid_token(self, app):
         """Test logout with invalid token."""
         client = TestClient(app)
         client.cookies.set("access_token", "invalid")
-        response = client.get("/logout")
+        response = client.get("/logout", follow_redirects=False)
 
         # Should still redirect to login
         assert response.status_code in [302, 303]
+        if response.status_code in [302, 303]:
+            assert "/login" in str(response.headers.get("location", ""))
 
 
 class TestHomeRoute:
