@@ -4,7 +4,7 @@ import uuid
 
 import jwt
 
-from ..config import JWT_SECRET
+from ..config import get_settings
 
 ALGORITHM = "HS256"
 
@@ -48,7 +48,8 @@ def create_access_token(
     to_encode = data.copy()
     expire = datetime.datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire, "iat": datetime.datetime.utcnow()})
-    return jwt.encode(to_encode, JWT_SECRET, algorithm=ALGORITHM)
+    settings = get_settings()
+    return jwt.encode(to_encode, settings.jwt_secret, algorithm=ALGORITHM)
 
 
 def create_session_token(
@@ -85,7 +86,8 @@ def verify_token(token: str) -> TokenPayload | None:
         None: All exceptions are handled internally.
     """
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[ALGORITHM])
+        settings = get_settings()
+        payload = jwt.decode(token, settings.jwt_secret, algorithms=[ALGORITHM])
         # Type cast to TokenPayload - jwt.decode returns dict[str, Any]
         return payload  # type: ignore[return-value]
     except jwt.ExpiredSignatureError:

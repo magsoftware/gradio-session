@@ -2,12 +2,12 @@ from datetime import timedelta
 
 import pytest
 
+from gradioapp.config import get_settings
 from gradioapp.domain.auth import (
     create_access_token,
     create_session_token,
     verify_token,
 )
-from gradioapp.config import JWT_SECRET
 
 
 class TestCreateAccessToken:

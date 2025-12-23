@@ -1,9 +1,10 @@
 from fastapi import Request
 from itsdangerous import URLSafeTimedSerializer
 
-from ..config import CSRF_SECRET, SECRET_KEY
+from ..config import get_settings
 
-serializer = URLSafeTimedSerializer(SECRET_KEY)
+settings = get_settings()
+serializer = URLSafeTimedSerializer(settings.secret_key)
 
 
 def generate_csrf_token(request: Request) -> str:
@@ -19,7 +20,7 @@ def generate_csrf_token(request: Request) -> str:
         str: A CSRF token string unique to the client's host.
     """
     host = request.client.host if request.client else "unknown"
-    return serializer.dumps(host, salt=CSRF_SECRET)
+    return serializer.dumps(host, salt=settings.csrf_secret)
 
 
 def validate_csrf_token(token: str, request: Request) -> bool:
@@ -35,7 +36,7 @@ def validate_csrf_token(token: str, request: Request) -> bool:
     """
     try:
         data = serializer.loads(
-            token, salt=CSRF_SECRET, max_age=3600
+            token, salt=settings.csrf_secret, max_age=3600
         )  # Token valid for 1 hour
         host = request.client.host if request.client else "unknown"
         return data == host

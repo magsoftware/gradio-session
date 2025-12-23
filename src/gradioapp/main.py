@@ -8,7 +8,7 @@ import uvicorn
 
 from .api.middleware import AuthMiddleware, LoggingMiddleware, SessionMiddleware
 from .api.routes import health_router, home_router, login_router, static_router
-from .config import PROJECTNAME, RELOAD, VERSION
+from .config import get_settings
 from .core.logging import setup_logging
 from .domain.session.backends.memory import InMemorySessionStore
 from .domain.session.store import initialize_session_store
@@ -23,8 +23,11 @@ setup_logging()
 # Setup session store
 initialize_session_store(InMemorySessionStore(ttl=300, cleanup_interval=60))
 
+# Get settings
+settings = get_settings()
+
 # Main FastAPI application
-app = FastAPI(title=PROJECTNAME, version=VERSION)
+app = FastAPI(title=settings.projectname, version=settings.version)
 
 # Middleware are executed in reverse order of their addition
 app.add_middleware(SessionMiddleware)
@@ -48,11 +51,12 @@ gr.mount_gradio_app(app, create_gradio_app(), path="/gradio")
 def main() -> None:
     """Main entry point for the application."""
     logger.info("Starting the application")
+    settings = get_settings()
     uvicorn.run(
         "gradioapp.main:app",
         host="0.0.0.0",
         port=8080,
-        reload=RELOAD,
+        reload=settings.reload,
         log_config=None,  # Disable uvicorn's default logging
     )
 

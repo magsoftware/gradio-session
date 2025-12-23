@@ -68,11 +68,12 @@ def load_settings() -> Settings:
 # Create settings instance
 _settings = load_settings()
 
-# Export individual settings for backward compatibility
-VERSION = _settings.version
-PROJECTNAME = _settings.projectname
-RELOAD = _settings.reload
-HOME_AS_HTML = _settings.home_as_html
-JWT_SECRET = _settings.jwt_secret
-SECRET_KEY = _settings.secret_key
-CSRF_SECRET = _settings.csrf_secret
+
+def get_settings() -> Settings:
+    """
+    Get the application settings instance.
+
+    Returns:
+        Settings: The configured settings instance.
+    """
+    return _settings
