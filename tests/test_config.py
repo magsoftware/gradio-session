@@ -44,6 +44,11 @@ class TestSettings:
         monkeypatch.setenv("JWT_SECRET", "a" * 32)
         monkeypatch.setenv("VERSION", "test")
         monkeypatch.setenv("PROJECTNAME", "test")
+        # Remove optional env vars to test defaults
+        monkeypatch.delenv("SECRET_KEY", raising=False)
+        monkeypatch.delenv("CSRF_SECRET", raising=False)
+        monkeypatch.delenv("RELOAD", raising=False)
+        monkeypatch.delenv("HOME_AS_HTML", raising=False)
 
         settings = load_settings()
 
