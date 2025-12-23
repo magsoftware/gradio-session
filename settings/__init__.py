@@ -5,10 +5,12 @@ from .base import (
     PROJECTNAME,
     RELOAD,
     SECRET_KEY,
+    Settings,
     VERSION,
 )
 
 __all__ = [
+    "Settings",
     "VERSION",
     "PROJECTNAME",
     "RELOAD",

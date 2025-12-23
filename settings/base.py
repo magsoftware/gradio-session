@@ -1,24 +1,78 @@
 import os
+from dataclasses import dataclass
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-VERSION = os.getenv("VERSION")
-PROJECTNAME = os.getenv("PROJECTNAME")
 
-RELOAD = os.getenv("RELOAD", "False").lower() == "true"
-HOME_AS_HTML = os.getenv("HOME_AS_HTML", "False").lower() == "true"
+@dataclass(frozen=True)
+class Settings:
+    """
+    Application settings loaded from environment variables.
 
-# JWT
-JWT_SECRET = os.getenv("JWT_SECRET")
-if not JWT_SECRET:
-    raise ValueError("JWT_SECRET environment variable is required")
-if len(JWT_SECRET) < 32:
-    raise ValueError(
-        "JWT_SECRET must be at least 32 characters long for security reasons"
+    Attributes:
+        version: Application version string.
+        projectname: Project name string.
+        reload: Enable auto-reload in development mode.
+        home_as_html: Serve home page as HTML.
+        jwt_secret: Secret key for JWT token signing (minimum 32 characters).
+        secret_key: Secret key for general use.
+        csrf_secret: Secret key for CSRF token generation.
+    """
+
+    version: str
+    projectname: str
+    reload: bool = False
+    home_as_html: bool = False
+    jwt_secret: str = ""
+    secret_key: str = ""
+    csrf_secret: str = ""
+
+    def __post_init__(self) -> None:
+        """
+        Validate settings after initialization.
+
+        Raises:
+            ValueError: If JWT_SECRET is missing or too short.
+        """
+        if not self.jwt_secret:
+            raise ValueError("JWT_SECRET environment variable is required")
+        if len(self.jwt_secret) < 32:
+            raise ValueError(
+                "JWT_SECRET must be at least 32 characters long for security reasons"
+            )
+
+
+def load_settings() -> Settings:
+    """
+    Load settings from environment variables.
+
+    Returns:
+        Settings: Configured settings instance.
+
+    Raises:
+        ValueError: If required settings are invalid.
+    """
+    return Settings(
+        version=os.getenv("VERSION", ""),
+        projectname=os.getenv("PROJECTNAME", ""),
+        reload=os.getenv("RELOAD", "False").lower() == "true",
+        home_as_html=os.getenv("HOME_AS_HTML", "False").lower() == "true",
+        jwt_secret=os.getenv("JWT_SECRET", ""),
+        secret_key=os.getenv("SECRET_KEY", ""),
+        csrf_secret=os.getenv("CSRF_SECRET", ""),
     )
 
-# CSRF
-SECRET_KEY = os.getenv("SECRET_KEY")
-CSRF_SECRET = os.getenv("CSRF_SECRET")
+
+# Create settings instance
+_settings = load_settings()
+
+# Export individual settings for backward compatibility
+VERSION = _settings.version
+PROJECTNAME = _settings.projectname
+RELOAD = _settings.reload
+HOME_AS_HTML = _settings.home_as_html
+JWT_SECRET = _settings.jwt_secret
+SECRET_KEY = _settings.secret_key
+CSRF_SECRET = _settings.csrf_secret
