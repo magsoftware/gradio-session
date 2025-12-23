@@ -75,7 +75,13 @@ async def login(
             session_id=session_id, username=user.username, data={}
         )
         response = RedirectResponse(url="/gradio", status_code=302)
-        response.set_cookie(key="access_token", value=access_token, httponly=True)
+        response.set_cookie(
+            key="access_token",
+            value=access_token,
+            httponly=True,
+            secure=True,
+            samesite="lax",
+        )
         logger.info(
             f"Login: user={user.username} successfully logged in, session_id={session_id}"
         )
@@ -116,7 +122,7 @@ async def logout(request: Request) -> RedirectResponse:
             )
 
     response = RedirectResponse(url="/login", status_code=303)
-    response.delete_cookie("access_token")
+    response.delete_cookie("access_token", secure=True, samesite="lax")
 
     logger.info("Logout: user successfully logged out")
     return response
