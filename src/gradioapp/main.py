@@ -23,11 +23,11 @@ setup_logging()
 # Setup session store
 initialize_session_store(InMemorySessionStore(ttl=300, cleanup_interval=60))
 
-# Get settings
-settings = get_settings()
+# Get settings for app initialization
+app_settings = get_settings()
 
 # Main FastAPI application
-app = FastAPI(title=settings.projectname, version=settings.version)
+app = FastAPI(title=app_settings.projectname, version=app_settings.version)
 
 # Middleware are executed in reverse order of their addition
 app.add_middleware(SessionMiddleware)

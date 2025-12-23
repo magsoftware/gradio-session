@@ -55,8 +55,10 @@ class InMemorySessionStore:
         Initializes the in-memory session store.
 
         Args:
-            ttl (int, optional): Time-to-live for each session in seconds. Defaults to 1800 (30 minutes).
-            cleanup_interval (int, optional): Interval in seconds at which expired sessions are cleaned up. Defaults to 60 seconds.
+            ttl (int, optional): Time-to-live for each session in seconds.
+                Defaults to 1800 (30 minutes).
+            cleanup_interval (int, optional): Interval in seconds at which expired
+                sessions are cleaned up. Defaults to 60 seconds.
 
         Starts a background thread to periodically remove expired sessions.
         """
@@ -197,7 +199,10 @@ class InMemorySessionStore:
             str: A formatted string containing the session ID, username, expiration time (ISO format), and session data.
         """
         expire_at_iso = datetime.fromtimestamp(session["expire_at"]).isoformat()
-        return f"Session ID: {session_id}, Username: {session['username']}, Expire At: {expire_at_iso}, Data: {session['data']}"
+        return (
+            f"Session ID: {session_id}, Username: {session['username']}, "
+            f"Expire At: {expire_at_iso}, Data: {session['data']}"
+        )
 
     def _cleanup_expired_sessions(self) -> None:
         """

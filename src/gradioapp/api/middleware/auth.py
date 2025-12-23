@@ -56,7 +56,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
         request.state.session_id = payload.get("session_id")
 
         logger.debug(
-            f"Access token verified for user {request.state.user_id}, session_id {request.state.session_id}, proceeding with the request."
+            f"Access token verified for user {request.state.user_id}, "
+            f"session_id {request.state.session_id}, proceeding with the request."
         )
 
         return await call_next(request)

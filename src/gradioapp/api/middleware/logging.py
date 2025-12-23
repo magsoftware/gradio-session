@@ -49,7 +49,8 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         session_id = getattr(request.state, "session_id", "n/a")
 
         logger.debug(
-            f"[{method}] {path} | status={response.status_code} | user_id={user_id} session_id={session_id} | {duration:.2f} ms"
+            f"[{method}] {path} | status={response.status_code} | "
+            f"user_id={user_id} session_id={session_id} | {duration:.2f} ms"
         )
 
         return response

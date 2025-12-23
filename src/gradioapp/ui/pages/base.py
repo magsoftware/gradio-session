@@ -14,7 +14,6 @@ class BasePage(ABC):
     @abstractmethod
     def create_ui(self) -> None:
         """Creates UI for the page."""
-        pass
 
     def render(self, visible: bool = False) -> None:
         with gr.Column(visible=visible) as self.container:
