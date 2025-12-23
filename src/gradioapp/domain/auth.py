@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta, timezone
 from typing import TypedDict
 import uuid
 
@@ -27,7 +27,7 @@ class TokenPayload(TypedDict):
 
 
 def create_access_token(
-    data: dict[str, str | int], expires_delta: datetime.timedelta
+    data: dict[str, str | int], expires_delta: timedelta
 ) -> str:
     """
     Generates a JSON Web Token (JWT) access token with an expiration time.
@@ -45,16 +45,17 @@ def create_access_token(
     Returns:
         str: The encoded JWT access token as a string.
     """
-    to_encode: dict[str, str | int | datetime.datetime] = dict(data)
-    expire = datetime.datetime.utcnow() + expires_delta
+    to_encode: dict[str, str | int | datetime] = dict(data)
+    now = datetime.now(timezone.utc)
+    expire = now + expires_delta
     to_encode["exp"] = expire
-    to_encode["iat"] = datetime.datetime.utcnow()
+    to_encode["iat"] = now
     settings = get_settings()
     return jwt.encode(to_encode, settings.jwt_secret, algorithm=ALGORITHM)
 
 
 def create_session_token(
-    user_id: str, expires_delta: datetime.timedelta
+    user_id: str, expires_delta: timedelta
 ) -> tuple[str, str]:
     """
     Creates a new session token and session ID for a given user.
