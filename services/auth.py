@@ -1,11 +1,29 @@
 import datetime
 import uuid
+from typing import TypedDict
 
 import jwt
 
 import settings
 
 ALGORITHM = "HS256"
+
+
+class TokenPayload(TypedDict):
+    """
+    Type definition for JWT token payload.
+
+    Attributes:
+        sub (str): Subject - the user ID.
+        session_id (str): The session ID associated with the token.
+        exp (int): Expiration time as Unix timestamp.
+        iat (int): Issued at time as Unix timestamp.
+    """
+
+    sub: str
+    session_id: str
+    exp: int
+    iat: int
 
 
 def create_access_token(data: dict, expires_delta: datetime.timedelta) -> str:
@@ -51,7 +69,7 @@ def create_session_token(
     return token, session_id
 
 
-def verify_token(token: str) -> dict | None:
+def verify_token(token: str) -> TokenPayload | None:
     """
     Verifies and decodes a JWT token.
 
@@ -59,14 +77,15 @@ def verify_token(token: str) -> dict | None:
         token (str): The JWT token to verify.
 
     Returns:
-        dict | None: The decoded payload if the token is valid, otherwise None.
+        TokenPayload | None: The decoded payload if the token is valid, otherwise None.
 
     Raises:
         None: All exceptions are handled internally.
     """
     try:
         payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[ALGORITHM])
-        return payload
+        # Type cast to TokenPayload - jwt.decode returns dict[str, Any]
+        return payload  # type: ignore[return-value]
     except jwt.ExpiredSignatureError:
         return None
     except jwt.InvalidTokenError:

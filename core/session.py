@@ -1,10 +1,8 @@
-from typing import Any
-
 from fastapi import Request
 import gradio as gr
 from loguru import logger
 
-from session import get_session_store
+from session import SessionData, get_session_store
 
 
 def get_session_id(request: gr.Request | Request) -> str | None:
@@ -24,7 +22,7 @@ def get_session_id(request: gr.Request | Request) -> str | None:
     return session_id
 
 
-def get_session(request: gr.Request | Request) -> dict[str, Any] | None:
+def get_session(request: gr.Request | Request) -> SessionData | None:
     """
     Retrieve the session data associated with the given request.
 
@@ -32,7 +30,7 @@ def get_session(request: gr.Request | Request) -> dict[str, Any] | None:
         request (gr.Request | Request): The incoming request object from which to extract the session ID.
 
     Returns:
-        dict[str, Any] | None: The session data as a dictionary if found, otherwise None.
+        SessionData | None: The session data as a SessionData dictionary if found, otherwise None.
     """
     session_id = get_session_id(request)
     if not session_id:

@@ -5,6 +5,8 @@ from typing import Any, Optional
 
 from loguru import logger
 
+from .session_store import SessionData
+
 
 class InMemorySessionStore:
     """
@@ -70,7 +72,7 @@ class InMemorySessionStore:
 
     def create_session(
         self, session_id: str, username: str, data: dict
-    ) -> dict[str, Any]:
+    ) -> SessionData:
         """
         Creates a new session with the given session ID, username, and associated data.
 
@@ -93,7 +95,7 @@ class InMemorySessionStore:
         logger.debug(self._format_session(session_id, session_data))
         return session_data
 
-    def get_session(self, session_id: str) -> Optional[dict]:
+    def get_session(self, session_id: str) -> Optional[SessionData]:
         """
         Retrieve a session by its session ID.
 
@@ -182,7 +184,7 @@ class InMemorySessionStore:
         logger.debug(s)
         return s
 
-    def _format_session(self, session_id: str, session: dict) -> str:
+    def _format_session(self, session_id: str, session: SessionData) -> str:
         """
         Formats the session information into a human-readable string.
 

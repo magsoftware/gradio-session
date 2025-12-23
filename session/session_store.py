@@ -1,4 +1,19 @@
-from typing import Any, Optional, Protocol
+from typing import Any, Optional, Protocol, TypedDict
+
+
+class SessionData(TypedDict):
+    """
+    Type definition for session data stored in the session store.
+
+    Attributes:
+        username (str): The username associated with the session.
+        data (dict[str, Any]): Additional data stored in the session.
+        expire_at (float): Expiration timestamp as Unix time.
+    """
+
+    username: str
+    data: dict[str, Any]
+    expire_at: float
 
 
 class SessionStore(Protocol):
@@ -6,13 +21,13 @@ class SessionStore(Protocol):
     Protocol for a session store, defining the required methods for managing user sessions.
 
     Methods:
-        create_session(session_id: str, username: str, data: dict) -> dict[str, Any]:
+        create_session(session_id: str, username: str, data: dict) -> SessionData:
             Create a new session with the given session ID, username, and associated data.
-            Returns the created session as a dictionary.
+            Returns the created session as a SessionData dictionary.
 
-        get_session(session_id: str) -> Optional[dict[str, Any]]:
+        get_session(session_id: str) -> Optional[SessionData]:
             Retrieve the session data for the given session ID.
-            Returns the session as a dictionary if found, otherwise None.
+            Returns the session as a SessionData dictionary if found, otherwise None.
 
         delete_session(session_id: str) -> None:
             Delete the session associated with the given session ID.
@@ -26,8 +41,8 @@ class SessionStore(Protocol):
 
     def create_session(
         self, session_id: str, username: str, data: dict
-    ) -> dict[str, Any]: ...
-    def get_session(self, session_id: str) -> Optional[dict[str, Any]]: ...
+    ) -> SessionData: ...
+    def get_session(self, session_id: str) -> Optional[SessionData]: ...
     def delete_session(self, session_id: str) -> None: ...
     def dump_session(self, session_id: str) -> str: ...
     def dump_store(self) -> str: ...
