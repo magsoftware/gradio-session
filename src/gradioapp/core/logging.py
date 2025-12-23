@@ -1,5 +1,5 @@
 import sys
-from typing import Any, Dict
+from typing import Any
 
 from loguru import logger
 
@@ -22,7 +22,7 @@ def setup_logging():
     logger.info("Logging initialized with custom format and location handler")
 
 
-def _format_location(record: Dict[str, Any]) -> bool:
+def _format_location(record: Any) -> bool:
     """
     Formats the 'location' field in a log record dictionary by combining the record's
     'name', 'function', and 'line' fields into a single string. The resulting string is

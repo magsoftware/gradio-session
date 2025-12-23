@@ -45,9 +45,10 @@ def create_access_token(
     Returns:
         str: The encoded JWT access token as a string.
     """
-    to_encode = data.copy()
+    to_encode: dict[str, str | int | datetime.datetime] = dict(data)
     expire = datetime.datetime.utcnow() + expires_delta
-    to_encode.update({"exp": expire, "iat": datetime.datetime.utcnow()})
+    to_encode["exp"] = expire
+    to_encode["iat"] = datetime.datetime.utcnow()
     settings = get_settings()
     return jwt.encode(to_encode, settings.jwt_secret, algorithm=ALGORITHM)
 

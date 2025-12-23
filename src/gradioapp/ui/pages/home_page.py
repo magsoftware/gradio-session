@@ -17,6 +17,8 @@ class Tab1(BaseTab):
     def show_session(self, request: gr.Request) -> str:
         session_id = get_session_id(request)
         logger.debug(f"Showing session for session_id: {session_id}")
+        if session_id is None:
+            return "No session ID found"
         return f"{get_session_store().dump_session(session_id)}"
 
 

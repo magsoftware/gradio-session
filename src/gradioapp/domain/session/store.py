@@ -36,7 +36,7 @@ class SessionStore(Protocol):
 
 
 # Singleton
-_session_store = None
+_session_store: SessionStore | None = None
 
 
 def initialize_session_store(store: SessionStore) -> None:
@@ -53,11 +53,16 @@ def initialize_session_store(store: SessionStore) -> None:
     _session_store = store
 
 
-def get_session_store() -> Optional[SessionStore]:
+def get_session_store() -> SessionStore:
     """
     Retrieve the current session store instance.
 
     Returns:
-        Optional[SessionStore]: The current session store instance if set, otherwise None.
+        SessionStore: The current session store instance.
+
+    Raises:
+        RuntimeError: If the session store has not been initialized.
     """
+    if _session_store is None:
+        raise RuntimeError("Session store has not been initialized. Call initialize_session_store() first.")
     return _session_store

@@ -415,6 +415,30 @@ uv run pylint src/gradioapp/main.py
 
 The project is configured to achieve a 10.00/10 pylint score. Configuration is in `pyproject.toml` under `[tool.pylint]`.
 
+#### Pyright
+
+Pyright is used for static type checking to verify type hints and catch type-related errors.
+
+Run pyright on all source files:
+
+```bash
+uv run pyright src/gradioapp
+```
+
+Run pyright on a specific file:
+
+```bash
+uv run pyright src/gradioapp/main.py
+```
+
+Run pyright with JSON output:
+
+```bash
+uv run pyright src/gradioapp --outputjson
+```
+
+The project uses type hints extensively (TypedDict, Protocol, union types) and pyright helps ensure type safety. Configuration is in `pyproject.toml` under `[tool.pyright]`.
+
 
 ## Summary
 

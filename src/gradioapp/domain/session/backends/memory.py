@@ -85,7 +85,7 @@ class InMemorySessionStore:
             dict[str, Any]: The session data stored, including username, data, and expiration timestamp.
         """
         expire_at = time.time() + self._ttl
-        session_data = {
+        session_data: SessionData = {
             "username": username,
             "data": data,
             "expire_at": expire_at,
