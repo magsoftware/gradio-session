@@ -1,10 +1,10 @@
 # Code Style (AI-Only)
 
 > This document defines mandatory project conventions.
-> These rules apply to AI-generated code only.
-> Deviations are not allowed unless explicitly requested by a human.
-
+> These rules apply to both human contributors and AI-generated code.
+>
 > **Note**: These rules are based on the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html) (official), with the following exception:
+>
 > - Line length: 120 characters (instead of Google's 80 characters)
 
 ## General Rules
