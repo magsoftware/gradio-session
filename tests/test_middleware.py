@@ -139,21 +139,32 @@ class TestSessionMiddleware:
         async def protected():
             return {"message": "ok"}
 
-        # Add AuthMiddleware first to set session_id in request.state
-        from gradioapp.api.middleware.auth import AuthMiddleware
-        from gradioapp.domain.auth import create_access_token
-
-        token = create_access_token(
-            {"sub": "test_user", "session_id": "test_session"},
-            expires_delta=timedelta(minutes=30),
-        )
-
+        # Add SessionMiddleware without AuthMiddleware - session_id won't be set
         app.add_middleware(SessionMiddleware)
-        app.add_middleware(AuthMiddleware)
         client = TestClient(app)
 
-        # Request without token - AuthMiddleware won't set session_id
-        response = client.get("/protected")
+        # Request without token - session_id won't be in request.state
+        with patch("gradioapp.api.middleware.session.logger") as mock_logger:
+            response = client.get("/protected")
+            mock_logger.warning.assert_called_once_with("Session ID not found in request state.")
+
+        assert response.status_code in [302, 401]  # Redirect or JSON error
+
+    def test_session_middleware_missing_session_id_direct(self, app, session_store):
+        """Test that missing session ID logs warning when SessionMiddleware is first."""
+        from gradioapp.api.middleware.session import SessionMiddleware
+
+        @app.get("/protected")
+        async def protected():
+            return {"message": "ok"}
+
+        # Add SessionMiddleware without AuthMiddleware - session_id won't be set
+        app.add_middleware(SessionMiddleware)
+        client = TestClient(app)
+
+        with patch("gradioapp.api.middleware.session.logger") as mock_logger:
+            response = client.get("/protected")
+            mock_logger.warning.assert_called_once_with("Session ID not found in request state.")
 
         assert response.status_code in [302, 401]  # Redirect or JSON error
 
