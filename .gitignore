@@ -194,3 +194,7 @@ cython_debug/
 # Cursor IDE
 .cursor/*
 !.cursor/rules/**
+
+# VSCode IDE
+.vscode/*
+!.vscode/tasks.json

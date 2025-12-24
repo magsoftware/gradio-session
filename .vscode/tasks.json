@@ -1,0 +1,99 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "git: add and commit",
+      "type": "shell",
+      "command": "git add . && git commit -m \"${input:commitMessage}\"",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "git: add, commit with conventional commit",
+      "type": "shell",
+      "command": "git add . && git commit -m \"${input:commitType}: ${input:commitMessage}\"",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "test: run all tests",
+      "type": "shell",
+      "command": "uv run python -m pytest tests/ -v",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "test: run tests with coverage",
+      "type": "shell",
+      "command": "uv run python -m pytest tests/ --cov=gradioapp --cov-report=term-missing",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "lint: run ruff",
+      "type": "shell",
+      "command": "uv run ruff check src/ tests/",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "lint: run pylint",
+      "type": "shell",
+      "command": "uv run pylint src/",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "format: run ruff format",
+      "type": "shell",
+      "command": "uv run ruff format src/ tests/",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "commitMessage",
+      "type": "promptString",
+      "description": "Enter commit message"
+    },
+    {
+      "id": "commitType",
+      "type": "pickString",
+      "description": "Select commit type",
+      "options": [
+        "feat",
+        "fix",
+        "docs",
+        "style",
+        "refactor",
+        "perf",
+        "test",
+        "chore",
+        "build",
+        "ci"
+      ]
+    }
+  ]
+}
