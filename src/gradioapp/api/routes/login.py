@@ -61,7 +61,7 @@ async def login_page(request: Request, error: str | None = None) -> HTMLResponse
     """
     csrf_token = generate_csrf_token(request)
     return templates.TemplateResponse(
-        "login.html", {"request": request, "error": error, "csrf_token": csrf_token}
+        request, "login.html", {"error": error, "csrf_token": csrf_token}
     )
 
 
@@ -95,8 +95,7 @@ async def login(
     if validation_error:
         logger.warning(f"Login form validation failed: {validation_error}")
         return templates.TemplateResponse(
-            "login.html",
-            {"request": request, "error": validation_error},
+            request, "login.html", {"error": validation_error}
         )
 
     if not validate_csrf_token(csrf_token, request):
@@ -126,7 +125,7 @@ async def login(
         return response
 
     return templates.TemplateResponse(
-        "login.html", {"request": request, "error": "Invalid credentials"}
+        request, "login.html", {"error": "Invalid credentials"}
     )
 
 

@@ -21,4 +21,4 @@ async def home_page(request: Request) -> HTMLResponse:
     Returns:
         HTMLResponse: The rendered HTML response for the home page.
     """
-    return templates.TemplateResponse("home.html", {"request": request})
+    return templates.TemplateResponse(request, "home.html")

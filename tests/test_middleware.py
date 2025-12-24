@@ -87,8 +87,9 @@ class TestAuthMiddleware:
 
         app.add_middleware(AuthMiddleware)
         client = TestClient(app)
+        client.cookies.set("access_token", test_token)
 
-        response = client.get("/protected", cookies={"access_token": test_token})
+        response = client.get("/protected")
 
         assert response.status_code == 200
         data = response.json()
@@ -103,8 +104,9 @@ class TestAuthMiddleware:
 
         app.add_middleware(AuthMiddleware)
         client = TestClient(app)
+        client.cookies.set("access_token", "invalid_token")
 
-        response = client.get("/protected", cookies={"access_token": "invalid_token"})
+        response = client.get("/protected")
 
         assert response.status_code in [302, 401]  # Redirect or JSON error
 
@@ -173,8 +175,9 @@ class TestSessionMiddleware:
         app.add_middleware(SessionMiddleware)
         app.add_middleware(AuthMiddleware)
         client = TestClient(app)
+        client.cookies.set("access_token", token)
 
-        response = client.get("/protected", cookies={"access_token": token})
+        response = client.get("/protected")
 
         assert response.status_code == 200
         assert response.json() == {"message": "ok"}
@@ -197,8 +200,9 @@ class TestSessionMiddleware:
         app.add_middleware(SessionMiddleware)
         app.add_middleware(AuthMiddleware)
         client = TestClient(app)
+        client.cookies.set("access_token", token)
 
-        response = client.get("/protected", cookies={"access_token": token})
+        response = client.get("/protected")
 
         assert response.status_code in [302, 401]  # Redirect or JSON error
 
