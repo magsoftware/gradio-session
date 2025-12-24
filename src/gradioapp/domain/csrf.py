@@ -39,4 +39,8 @@ def validate_csrf_token(token: str, request: Request) -> bool:
         host = request.client.host if request.client else "unknown"
         return data == host
     except Exception:
+        # Catching generic Exception is intentional here for security reasons:
+        # - Prevents information leakage about specific failure types (BadSignature, SignatureExpired, etc.)
+        # - Returns False for any validation failure, maintaining consistent security posture
+        # - Protects against timing attacks by not revealing why validation failed
         return False

@@ -33,6 +33,10 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         try:
             response = await call_next(request)
         except Exception:
+            # Catching generic Exception is intentional here for logging middleware:
+            # - Must catch ALL exceptions to log them with context before re-raising
+            # - Cannot use specific exceptions as we don't know what exceptions handlers may raise
+            # - Re-raises the exception after logging to maintain normal error propagation
             duration = (time.perf_counter() - start_time) * 1000
             user_id = getattr(request.state, "user_id", "anonymous")
             session_id = getattr(request.state, "session_id", "n/a")
