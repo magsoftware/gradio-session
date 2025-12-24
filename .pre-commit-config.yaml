@@ -11,7 +11,7 @@ repos:
         args: [--markdown-linebreak-ext=md]
       - id: end-of-file-fixer
       - id: check-yaml
-        args: [--unsafe]  # Allow custom tags
+        args: [--unsafe] # Allow custom tags
       - id: check-toml
       - id: check-json
       - id: check-added-large-files
