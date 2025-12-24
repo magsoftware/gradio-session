@@ -1,0 +1,20 @@
+# Markdown
+
+> This document defines mandatory project conventions.
+> These rules apply to both human contributors and AI-generated code.
+
+When generating Markdown files:
+
+- Use (`-`) for bullet lists.
+- Wrap lines at 100 characters where possible.
+- Place code blocks using triple backticks with language annotations.
+- Always add empty trailing lines at the end of files.
+- Always format tables in GitHub-compatible format.
+- Avoid passive voice; keep sentences short.
+- Titles must be in Title Case.
+- Bold key terms using **double asterisks**.
+- Do not auto-generate table of contents unless explicitly requested.
+- Always put a single empty line before and after bullet lists.
+- Always put a single empty line before and after numbered lists.
+- Always put a single empty line before and after code blocks.
+- Do not use icons.

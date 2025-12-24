@@ -190,3 +190,7 @@ cython_debug/
 # macOS metadata
 *.swp
 .fseventsd
+
+# Cursor IDE
+.cursor/*
+!.cursor/rules/**

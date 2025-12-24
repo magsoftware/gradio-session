@@ -1,0 +1,40 @@
+# API Conventions
+
+> This document defines mandatory project conventions.
+> These rules apply to both human contributors and AI-generated code.
+
+## Route Structure
+
+- Use `APIRouter` from FastAPI for route organization
+- Group routes by functionality (login, health, home, etc.)
+- Use descriptive route names with `name` parameter
+
+## Response Types
+
+- **HTMLResponse**: For browser-accessible pages (login, home)
+- **JSONResponse**: For API endpoints (health check, API calls)
+- **RedirectResponse**: For redirects (after login, logout, errors)
+
+## Endpoint Patterns
+
+- Health check: `/healthz` returns `{"status": "ok"}`
+- Login: `/login` (GET for page, POST for authentication)
+- Logout: `/logout` (GET, redirects to login)
+- Home: `/` (GET, renders home page)
+
+## Request Handling
+
+- Use `Request` object from FastAPI for request context
+- Access user/session info via `request.state.user_id` and `request.state.session_id`
+- Use `is_browser_request()` to differentiate browser vs API requests
+
+## Response Helpers
+
+- Use `create_unauthorized_response()` for 401 errors
+- Browser requests → RedirectResponse to `/login`
+- API requests → JSONResponse with error details
+
+## Tags
+
+- Use `tags` parameter for API documentation grouping
+- Example: `@router.get("/healthz", tags=["Health"])`
