@@ -103,4 +103,3 @@ class TestVerifyToken:
         # Token should verify with current secret
         payload = verify_token(token)
         assert payload is not None
-

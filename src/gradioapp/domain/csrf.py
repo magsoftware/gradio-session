@@ -35,9 +35,7 @@ def validate_csrf_token(token: str, request: Request) -> bool:
         bool: True if the token is valid and matches the client's host, False otherwise.
     """
     try:
-        data = serializer.loads(
-            token, salt=settings.csrf_secret, max_age=3600
-        )  # Token valid for 1 hour
+        data = serializer.loads(token, salt=settings.csrf_secret, max_age=3600)  # Token valid for 1 hour
         host = request.client.host if request.client else "unknown"
         return data == host
     except Exception:

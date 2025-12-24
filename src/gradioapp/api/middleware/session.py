@@ -28,15 +28,11 @@ class SessionMiddleware(BaseHTTPMiddleware):
             if session validation fails.
     """
 
-    async def dispatch(
-        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         logger.debug(f"Processing request: {request.method} {request.url.path}")
 
         if is_path_allowed(request.url.path):
-            logger.debug(
-                f"Path {request.url.path} matches allowed patterns. Skipping session middleware."
-            )
+            logger.debug(f"Path {request.url.path} matches allowed patterns. Skipping session middleware.")
             return await call_next(request)
 
         session_id = getattr(request.state, "session_id", None)

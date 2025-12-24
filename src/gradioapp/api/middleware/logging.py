@@ -25,9 +25,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             after processing, and ensures exceptions are logged with context.
     """
 
-    async def dispatch(
-        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         start_time = time.perf_counter()
         method = request.method
         path = request.url.path

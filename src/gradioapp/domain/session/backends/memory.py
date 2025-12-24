@@ -67,9 +67,7 @@ class InMemorySessionStore:
         self._ttl = ttl  # Default TTL for sessions in seconds
         self._cleanup_interval = cleanup_interval
         self._stop_cleanup_thread = threading.Event()
-        self._cleanup_thread = threading.Thread(
-            target=self._cleanup_expired_sessions, daemon=True
-        )
+        self._cleanup_thread = threading.Thread(target=self._cleanup_expired_sessions, daemon=True)
         self._cleanup_thread.start()
 
     def create_session(self, session_id: str, username: str, data: dict) -> SessionData:
@@ -172,14 +170,8 @@ class InMemorySessionStore:
         """
         with self._lock:
             # Copy all sessions data before releasing lock
-            sessions_data = {
-                session_id: session.copy()
-                for session_id, session in self._store.items()
-            }
-        sessions = [
-            self._format_session(session_id, session)
-            for session_id, session in sessions_data.items()
-        ]
+            sessions_data = {session_id: session.copy() for session_id, session in self._store.items()}
+        sessions = [self._format_session(session_id, session) for session_id, session in sessions_data.items()]
         s = "Session store:\n" + "\n".join(sessions)
         logger.debug(s)
         return s
@@ -219,9 +211,7 @@ class InMemorySessionStore:
             current_time = time.time()
             with self._lock:
                 expired_sessions = [
-                    session_id
-                    for session_id, session in self._store.items()
-                    if session["expire_at"] < current_time
+                    session_id for session_id, session in self._store.items() if session["expire_at"] < current_time
                 ]
                 for session_id in expired_sessions:
                     self._store.pop(session_id, None)

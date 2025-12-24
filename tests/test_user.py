@@ -84,4 +84,3 @@ class TestAuthenticateUser:
         user = authenticate_user("nonexistent@test.com", "secret")
 
         assert user is None
-

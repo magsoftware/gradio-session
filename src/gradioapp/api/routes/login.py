@@ -60,9 +60,7 @@ async def login_page(request: Request, error: str | None = None) -> HTMLResponse
         HTMLResponse: The rendered login page with a CSRF token included in the context.
     """
     csrf_token = generate_csrf_token(request)
-    return templates.TemplateResponse(
-        request, "login.html", {"error": error, "csrf_token": csrf_token}
-    )
+    return templates.TemplateResponse(request, "login.html", {"error": error, "csrf_token": csrf_token})
 
 
 @router.post("/login", response_model=None)
@@ -94,9 +92,7 @@ async def login(
     validation_error = validate_login_form(username, password, csrf_token)
     if validation_error:
         logger.warning(f"Login form validation failed: {validation_error}")
-        return templates.TemplateResponse(
-            request, "login.html", {"error": validation_error}
-        )
+        return templates.TemplateResponse(request, "login.html", {"error": validation_error})
 
     if not validate_csrf_token(csrf_token, request):
         url = URL("/login").include_query_params(error="Invalid CSRF token")
@@ -104,12 +100,8 @@ async def login(
 
     user = authenticate_user(username, password)
     if user:
-        access_token, session_id = create_session_token(
-            username, expires_delta=timedelta(minutes=30)
-        )
-        get_session_store().create_session(
-            session_id=session_id, username=user.username, data={}
-        )
+        access_token, session_id = create_session_token(username, expires_delta=timedelta(minutes=30))
+        get_session_store().create_session(session_id=session_id, username=user.username, data={})
         response = RedirectResponse(url="/gradio", status_code=302)
         response.set_cookie(
             key="access_token",
@@ -118,20 +110,14 @@ async def login(
             secure=True,
             samesite="lax",
         )
-        logger.info(
-            f"Login: user={user.username} successfully logged in, session_id={session_id}"
-        )
+        logger.info(f"Login: user={user.username} successfully logged in, session_id={session_id}")
 
         return response
 
-    return templates.TemplateResponse(
-        request, "login.html", {"error": "Invalid credentials"}
-    )
+    return templates.TemplateResponse(request, "login.html", {"error": "Invalid credentials"})
 
 
-@router.get(
-    "/logout", name="logout", response_class=RedirectResponse, response_model=None
-)
+@router.get("/logout", name="logout", response_class=RedirectResponse, response_model=None)
 async def logout(request: Request) -> RedirectResponse:
     """
     Logs out the current user by invalidating their session and removing the access token cookie.
@@ -154,9 +140,7 @@ async def logout(request: Request) -> RedirectResponse:
             session_id = payload.get("session_id")
             if session_id:
                 get_session_store().delete_session(session_id)
-                logger.info(
-                    f"Logout: session {session_id} for the user {payload.get('sub')} invalidated"
-                )
+                logger.info(f"Logout: session {session_id} for the user {payload.get('sub')} invalidated")
 
     response = RedirectResponse(url="/login", status_code=303)
     response.delete_cookie("access_token", secure=True, samesite="lax")

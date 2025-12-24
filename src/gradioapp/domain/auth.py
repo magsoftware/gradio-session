@@ -26,9 +26,7 @@ class TokenPayload(TypedDict):
     iat: int
 
 
-def create_access_token(
-    data: dict[str, str | int], expires_delta: timedelta
-) -> str:
+def create_access_token(data: dict[str, str | int], expires_delta: timedelta) -> str:
     """
     Generates a JSON Web Token (JWT) access token with an expiration time.
 
@@ -54,9 +52,7 @@ def create_access_token(
     return jwt.encode(to_encode, settings.jwt_secret, algorithm=ALGORITHM)
 
 
-def create_session_token(
-    user_id: str, expires_delta: timedelta
-) -> tuple[str, str]:
+def create_session_token(user_id: str, expires_delta: timedelta) -> tuple[str, str]:
     """
     Creates a new session token and session ID for a given user.
 
@@ -68,9 +64,7 @@ def create_session_token(
         tuple[str, str]: A tuple containing the generated access token and the session ID.
     """
     session_id = str(uuid.uuid4())
-    token = create_access_token(
-        {"sub": user_id, "session_id": session_id}, expires_delta
-    )
+    token = create_access_token({"sub": user_id, "session_id": session_id}, expires_delta)
     return token, session_id
 
 

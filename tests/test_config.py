@@ -29,9 +29,7 @@ class TestSettings:
         monkeypatch.setenv("VERSION", "test")
         monkeypatch.setenv("PROJECTNAME", "test")
 
-        with pytest.raises(
-            ValueError, match="JWT_SECRET must be at least 32 characters long"
-        ):
+        with pytest.raises(ValueError, match="JWT_SECRET must be at least 32 characters long"):
             load_settings()
 
     def test_settings_frozen(self, test_settings):
@@ -56,4 +54,3 @@ class TestSettings:
         assert settings.home_as_html is False
         assert settings.secret_key == ""
         assert settings.csrf_secret == ""
-

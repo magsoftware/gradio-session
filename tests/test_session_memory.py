@@ -53,7 +53,7 @@ class TestInMemorySessionStore:
         with short_ttl_store._lock:
             if session_id in short_ttl_store._store:
                 short_ttl_store._store[session_id]["expire_at"] = time.time() - 1
-        
+
         retrieved = short_ttl_store.get_session(session_id)
 
         assert retrieved is None
@@ -119,7 +119,7 @@ class TestInMemorySessionStore:
     @pytest.mark.skip(reason="Thread safety test can hang due to cleanup thread interaction")
     def test_thread_safety(self):
         """Test thread safety of session operations.
-        
+
         NOTE: This test is skipped because it can hang due to cleanup thread
         interaction. Thread safety is verified by the RLock implementation
         and other concurrent tests.
@@ -128,7 +128,7 @@ class TestInMemorySessionStore:
 
         # Create a store with very long cleanup interval
         test_store = InMemorySessionStore(ttl=300, cleanup_interval=3600)
-        
+
         try:
             results = []
             errors = []
@@ -150,7 +150,7 @@ class TestInMemorySessionStore:
             threads = []
             thread_count = 3
             sessions_per_thread = 5
-            
+
             for i in range(thread_count):
                 thread = threading.Thread(target=create_sessions, args=(i, sessions_per_thread))
                 threads.append(thread)
@@ -164,4 +164,3 @@ class TestInMemorySessionStore:
             assert len(results) == thread_count * sessions_per_thread
         finally:
             test_store.stop_cleanup_thread()
-

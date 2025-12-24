@@ -41,9 +41,7 @@ class HomePage(BasePage):
             Tab1(),
             Tab2(),
         ]
-        logger.info(
-            f"HomePage initialized with tabs: {[tab.name for tab in self.tabs]}"
-        )
+        logger.info(f"HomePage initialized with tabs: {[tab.name for tab in self.tabs]}")
 
     def create_ui(self) -> None:
         with gr.Tabs():

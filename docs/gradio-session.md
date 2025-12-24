@@ -9,7 +9,7 @@ This article introduces Gradio‑Session, a framework that combines FastAPI and 
 Gradio is a fantastic rapid‑prototyping UI framework. However, for production applications, its built‑in mechanisms for authentication and state (gr.State, gr.BrowserState) are simplified and limited:
 
 - No built‑in user management or login flows.
-- gr.State resides within the Gradio process—leading to session conflicts, especially in multi‑user or multi‑server setups 
+- gr.State resides within the Gradio process—leading to session conflicts, especially in multi‑user or multi‑server setups
 - Scaling Gradio horizontally is difficult when state is tied to one process.
 
 These limitations become roadblocks when building multi‑tenant, secure dashboards or LLM‑powered applications.

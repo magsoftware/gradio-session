@@ -3,10 +3,10 @@
 from datetime import timedelta
 from unittest.mock import AsyncMock, patch
 
-import pytest
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.testclient import TestClient
+import pytest
 from starlette.responses import Response
 
 from gradioapp.api.middleware.auth import AuthMiddleware
@@ -48,6 +48,7 @@ class TestAuthMiddleware:
 
     def test_auth_middleware_allowed_path(self, app):
         """Test that allowed paths bypass authentication."""
+
         @app.get("/login")
         async def login():
             return {"message": "ok"}
@@ -62,6 +63,7 @@ class TestAuthMiddleware:
 
     def test_auth_middleware_missing_token(self, app):
         """Test that missing token returns unauthorized response."""
+
         @app.get("/protected")
         async def protected():
             return {"message": "ok"}
@@ -98,6 +100,7 @@ class TestAuthMiddleware:
 
     def test_auth_middleware_invalid_token(self, app):
         """Test that invalid token returns unauthorized response."""
+
         @app.get("/protected")
         async def protected():
             return {"message": "ok"}
@@ -116,6 +119,7 @@ class TestSessionMiddleware:
 
     def test_session_middleware_allowed_path(self, app):
         """Test that allowed paths bypass session validation."""
+
         @app.get("/login")
         async def login():
             return {"message": "ok"}
@@ -130,6 +134,7 @@ class TestSessionMiddleware:
 
     def test_session_middleware_missing_session_id(self, app, session_store):
         """Test that missing session ID returns unauthorized response."""
+
         @app.get("/protected")
         async def protected():
             return {"message": "ok"}
@@ -159,9 +164,7 @@ class TestSessionMiddleware:
 
         # Create a session
         session_id = "test_session"
-        session_store.create_session(
-            session_id=session_id, username="test_user", data={}
-        )
+        session_store.create_session(session_id=session_id, username="test_user", data={})
 
         token = create_access_token(
             {"sub": "test_user", "session_id": session_id},
@@ -212,6 +215,7 @@ class TestLoggingMiddleware:
 
     def test_logging_middleware_success(self, app):
         """Test that logging middleware logs successful requests."""
+
         @app.get("/test")
         async def test():
             return {"message": "ok"}
@@ -228,6 +232,7 @@ class TestLoggingMiddleware:
 
     def test_logging_middleware_exception(self, app):
         """Test that logging middleware logs exceptions."""
+
         @app.get("/test")
         async def test():
             raise ValueError("Test error")
@@ -240,4 +245,3 @@ class TestLoggingMiddleware:
                 client.get("/test")
 
             mock_logger.exception.assert_called_once()
-

@@ -36,4 +36,3 @@
 - LoggingMiddleware catches all exceptions and logs them
 - Always include request context (method, path, user_id, session_id)
 - Log duration of request before exception occurred
-

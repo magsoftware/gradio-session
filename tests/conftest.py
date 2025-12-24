@@ -42,4 +42,3 @@ def test_token(test_settings):
         {"sub": "test_user", "session_id": "test_session"},
         expires_delta=timedelta(minutes=30),
     )
-

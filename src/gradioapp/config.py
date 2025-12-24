@@ -39,9 +39,7 @@ class Settings:
         if not self.jwt_secret:
             raise ValueError("JWT_SECRET environment variable is required")
         if len(self.jwt_secret) < 32:
-            raise ValueError(
-                "JWT_SECRET must be at least 32 characters long for security reasons"
-            )
+            raise ValueError("JWT_SECRET must be at least 32 characters long for security reasons")
 
 
 def load_settings() -> Settings:

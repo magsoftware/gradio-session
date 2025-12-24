@@ -46,4 +46,3 @@
   - User ID and session ID
   - Request duration in milliseconds
 - Logs exceptions with same context
-

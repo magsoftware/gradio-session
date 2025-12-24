@@ -3,9 +3,9 @@
 from datetime import timedelta
 from unittest.mock import patch
 
-import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+import pytest
 
 from gradioapp.api.routes import health_router, home_router, login_router
 from gradioapp.domain.auth import create_access_token, create_session_token
@@ -78,9 +78,7 @@ class TestLoginRoute:
         client = TestClient(app)
 
         # Mock CSRF token validation and user authentication
-        with patch(
-            "gradioapp.api.routes.login.validate_csrf_token", return_value=True
-        ), patch(
+        with patch("gradioapp.api.routes.login.validate_csrf_token", return_value=True), patch(
             "gradioapp.api.routes.login.authenticate_user"
         ) as mock_auth:
             # Mock successful authentication
@@ -108,9 +106,7 @@ class TestLoginRoute:
         """Test login with invalid credentials."""
         client = TestClient(app)
 
-        with patch(
-            "gradioapp.api.routes.login.validate_csrf_token", return_value=True
-        ):
+        with patch("gradioapp.api.routes.login.validate_csrf_token", return_value=True):
             response = client.post(
                 "/login",
                 data={
@@ -127,9 +123,7 @@ class TestLoginRoute:
         """Test login with invalid CSRF token."""
         client = TestClient(app)
 
-        with patch(
-            "gradioapp.api.routes.login.validate_csrf_token", return_value=False
-        ), patch(
+        with patch("gradioapp.api.routes.login.validate_csrf_token", return_value=False), patch(
             "gradioapp.api.routes.login.generate_csrf_token", return_value="test_token"
         ):
             response = client.post(
@@ -153,9 +147,7 @@ class TestLoginRoute:
         """Test login with invalid form data (too long username)."""
         client = TestClient(app)
 
-        with patch(
-            "gradioapp.api.routes.login.validate_csrf_token", return_value=True
-        ):
+        with patch("gradioapp.api.routes.login.validate_csrf_token", return_value=True):
             # Username too long (over 255 characters)
             long_username = "a" * 256
             response = client.post(
@@ -177,12 +169,8 @@ class TestLogoutRoute:
     def test_logout_with_valid_token(self, app, session_store):
         """Test logout with valid token."""
         # Create session and token
-        token, session_id = create_session_token(
-            "test_user", expires_delta=timedelta(minutes=30)
-        )
-        session_store.create_session(
-            session_id=session_id, username="test_user", data={}
-        )
+        token, session_id = create_session_token("test_user", expires_delta=timedelta(minutes=30))
+        session_store.create_session(session_id=session_id, username="test_user", data={})
 
         client = TestClient(app)
         # Set cookie on client instead of per-request
@@ -229,4 +217,3 @@ class TestHomeRoute:
 
         assert response.status_code == 200
         assert "text/html" in response.headers["content-type"]
-

@@ -51,9 +51,7 @@ def is_browser_request(request: Request) -> bool:
     return "text/html" in accept_header
 
 
-def create_unauthorized_response(
-    request: Request, error_message: str, redirect_url: str = "/login"
-) -> Response:
+def create_unauthorized_response(request: Request, error_message: str, redirect_url: str = "/login") -> Response:
     """
     Creates an appropriate unauthorized response based on the request type.
 

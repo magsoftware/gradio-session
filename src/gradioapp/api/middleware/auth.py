@@ -37,9 +37,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         logger.debug(f"Processing request: {request.method} {request.url.path}")
 
         if is_path_allowed(request.url.path):
-            logger.debug(
-                f"Path {request.url.path} matches allowed patterns. Skipping auth."
-            )
+            logger.debug(f"Path {request.url.path} matches allowed patterns. Skipping auth.")
             return await call_next(request)
 
         token = request.cookies.get("access_token")
