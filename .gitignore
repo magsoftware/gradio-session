@@ -192,7 +192,8 @@ cython_debug/
 .fseventsd
 
 # Cursor IDE
-.cursor/*
+.cursor/**
+!.cursor/rules/
 !.cursor/rules/**
 
 # VSCode IDE
