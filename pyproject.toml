@@ -77,6 +77,17 @@ max-returns = 6
 max-branches = 15
 max-statements = 50
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+filterwarnings = [
+    "ignore::DeprecationWarning:websockets.legacy",
+    "ignore::DeprecationWarning:gradio.utils",
+]
+
 [tool.pyright]
 include = ["src"]
 exclude = ["**/__pycache__", "**/node_modules", ".venv"]
