@@ -117,6 +117,29 @@ async def login(
     return templates.TemplateResponse(request, "login.html", {"error": "Invalid credentials"})
 
 
+def _invalidate_session_if_token_valid(request: Request) -> None:
+    """
+    Invalidates session if valid token is present in request cookies.
+
+    Args:
+        request (Request): The incoming HTTP request containing cookies.
+    """
+    token = request.cookies.get("access_token")
+    if not token:
+        return
+
+    payload = verify_token(token)
+    if not payload:
+        return
+
+    session_id = payload.get("session_id")
+    if not session_id:
+        return
+
+    get_session_store().delete_session(session_id)
+    logger.info(f"Logout: session {session_id} for the user {payload.get('sub')} invalidated")
+
+
 @router.get("/logout", name="logout", response_class=RedirectResponse, response_model=None)
 async def logout(request: Request) -> RedirectResponse:
     """
@@ -132,18 +155,9 @@ async def logout(request: Request) -> RedirectResponse:
     Returns:
         RedirectResponse: A redirect response to the login page with the access token cookie deleted.
     """
-    token = request.cookies.get("access_token")
-    if token:
-        payload = verify_token(token)
-        if payload:
-            # Invalidate the session
-            session_id = payload.get("session_id")
-            if session_id:
-                get_session_store().delete_session(session_id)
-                logger.info(f"Logout: session {session_id} for the user {payload.get('sub')} invalidated")
+    _invalidate_session_if_token_valid(request)
 
     response = RedirectResponse(url="/login", status_code=303)
     response.delete_cookie("access_token", secure=True, samesite="lax")
-
     logger.info("Logout: user successfully logged out")
     return response
