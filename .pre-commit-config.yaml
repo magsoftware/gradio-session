@@ -9,11 +9,16 @@ repos:
     hooks:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
+        exclude: \.lock$
       - id: end-of-file-fixer
+        exclude: \.lock$
       - id: check-yaml
         args: [--unsafe] # Allow custom tags
+        types: [yaml]
       - id: check-toml
+        types: [toml]
       - id: check-json
+        types: [json]
       - id: check-added-large-files
         args: [--maxkb=500]
       - id: check-merge-conflict
@@ -29,10 +34,12 @@ repos:
       # Ruff format (replaces black)
       - id: ruff-format
         args: [--line-length=120]
+        types: [python]
       # Ruff lint (imports only, as configured in pyproject.toml)
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix, --select=I]
         additional_dependencies: []
+        types: [python]
 
   # Pytest - run tests (HIGH PRIORITY)
   - repo: local
@@ -43,7 +50,14 @@ repos:
         language: system
         args: [tests/, -v, --tb=short]
         pass_filenames: false
-        always_run: true
+        files: |
+          (?x)^(
+            src/.*\.py|
+            tests/.*\.py|
+            pyproject\.toml|
+            setup\.py|
+            setup\.cfg
+          )$
         stages: [pre-commit]
 
   # Commit message format - conventional commits (HIGH PRIORITY)
